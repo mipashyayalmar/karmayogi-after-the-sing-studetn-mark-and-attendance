@@ -1,0 +1,265 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %} KIT Management System {% endblock %}
+
+{% block content %}
+<marquee>Welcome {{ profile.user.username|title }}</marquee>
+
+<style>
+    .bg-class { background-color: darkblue; }
+    .bg-student { background-color: violet; }
+    .bg-warning { background-color: yellowgreen; }
+    .attendance-graph {
+        width: 100%;
+        height: 300px;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="animated fadeIn">
+    <div class="row">
+        <div class="col-sm-6 col-lg-3">
+            <div class="card text-white bg-student">
+                <div class="card-body pb-0">
+                    <div class="btn-group float-right">
+                        <button class="btn btn-transparent dropdown-toggle p-0" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="icon-settings"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="{% url 'student-list' %}">Student List</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </div>
+                    <div class="text-value"><a href="{% url 'student-list' %}" class="btn btn-primary"> {{ student.personal_info.name }}</a></div>
+                    <div>Student Name</div>
+                </div>
+                <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+                    <canvas class="chart chartjs-render-monitor" id="card-chart1" height="70" width="319"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body pb-0">
+                    <div class="btn-group float-right">
+                        <button class="btn btn-transparent dropdown-toggle p-0" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="icon-settings"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="{% url 'teacher-list' %}">Teacher List</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </div>
+
+                    <!-- Show department-wise teacher count -->
+                    <div class="text-value">
+                        <a href="{% url 'teacher-list' %}" class="btn btn-primary">
+                            {{ teacher_count }} <!-- Show teacher count in the department -->
+                        </a>
+                    </div>
+                    <div>Total Teachers in Your Department</div>
+                </div>
+                <div class="chart-wrapper mt-3" style="height:70px;">
+                    <canvas class="chart chartjs-render-monitor" id="card-chart3" height="70" width="351"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body pb-0">
+                    <div class="btn-group float-right">
+                        <button class="btn btn-transparent dropdown-toggle p-0" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="icon-settings"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="{% url 'employee-list' %}">Employee List</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </div>
+        
+                    <!-- Show the total employee count based on department if user is teacher or professor -->
+                    <div class="text-value">
+                        <a href="{% url 'employee-list' %}" class="btn btn-primary">
+                            {{ employee_count }}
+                        </a>
+                    </div>
+                    <div>Total Employees</div>
+                </div>
+                <div class="chart-wrapper mt-3" style="height:70px;">
+                    <canvas class="chart chartjs-render-monitor" id="card-chart3" height="70" width="351"></canvas>
+                </div>
+            </div>
+        </div>
+        
+
+        <div class="col-sm-6 col-lg-3">
+            <div class="card text-white bg-class">
+                <div class="card-body pb-0">
+                    <div class="btn-group float-right">
+                        <button class="btn btn-transparent dropdown-toggle p-0" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="icon-settings"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="{% url 'class-list' %}">Class List</a>
+                            
+                            <!-- Subjects list dropdown -->
+                            {% if subjects.count > 0 %}
+                                <a class="dropdown-item" href="#">Total Subjects: {{ subjects.count }}</a>
+                                {% for subject in subjects %}
+                                    <a class="dropdown-item" href="{% url 'subject-detail' subject.id %}">
+                                        <i class="fa fa-angle-double-right" style="font-size:18px;"></i> 
+                                        {{ subject.subject_name }} (Code: {{ subject.subject_code }})
+                                    </a>
+                                {% endfor %}
+                            {% else %}
+                                <a class="dropdown-item" href="#">No subjects allocated</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-value"><a href="{% url 'class-list' %}" class="btn btn-primary">{{ student.class_info|upper }}</a></div>
+                    <div>My Class</div>
+                </div>
+                <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+                    <canvas class="chart chartjs-render-monitor" id="card-chart4" height="70" width="319"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="table-responsive">
+    <div class="col-sm-12 table table-responsive-lg">
+        <h3>Student Details</h3>
+        <table class="table table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Registration Number</th>
+                    <th>Name</th>
+                    <th>Class</th>
+                    <th>Class Teacher</th>
+                    <th>Session</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ student.registration_no }}</td>
+                    <td>{{ student.personal_info.name }}</td>
+                    <td>{{ student.class_info }}</td>
+                    <td>{{ student.class_teacher|title }}</td>
+                    <td>{{ student.session_info }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Attendance Table with Percentile -->
+    <div class="col-sm-12 table table-responsive-lg">
+        <h3>Attendance Details</h3>
+        <table class="table table-striped table-bordered">
+            <thead class="thead-light">
+                <tr>
+                    <th>Subject</th>
+                    <th>Total Present</th>
+                    <th>Total Absent</th>
+                    <th>Total Days</th>
+                    <th>Attendance Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject, attendance in subject_attendance_percentages.items %}
+                    <tr>
+                        <td>{{ subject }}</td>
+                        <td>{{ attendance.present }}</td>
+                        <td>{{ attendance.absent }}</td>
+                        <td>{{ attendance.total_days }}</td>
+                        <td>{{ attendance.percentage }}%</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="content-box mx-auto desktop-only" >
+    <h3>Subject-wise Attendance Overview</h3>
+    <canvas id="subjectAttendanceChart" class="attendance-graph"></canvas>
+</div>
+
+<style>
+    @media (min-width: 768px) {
+        .desktop-only{
+            width: 70%;
+            height: 50%;
+        }
+    }
+</style>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Parse the subject-wise attendance data from the view
+        const subjectWiseAttendance = JSON.parse('{{ subject_wise_attendance|escapejs }}');
+        
+        // Prepare the data for the chart
+        const labels = Object.keys(subjectWiseAttendance);  // Subject names
+        const presentData = labels.map(subject => subjectWiseAttendance[subject].present);  // Present counts
+        const absentData = labels.map(subject => subjectWiseAttendance[subject].absent);    // Absent counts
+    
+        // Data for the bar chart
+        const data = {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Present',
+                    data: presentData,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgb(75, 192, 192)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Absent',
+                    data: absentData,
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    borderColor: 'rgb(255, 99, 132)',
+                    borderWidth: 1
+                }
+            ]
+        };
+    
+        // Chart configuration
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Attendance Count'
+                        }
+                    }
+                }
+            }
+        };
+    
+        // Render the chart
+        new Chart(document.getElementById('subjectAttendanceChart'), config);
+    </script>
+    
+
+
+
+{% endblock %}

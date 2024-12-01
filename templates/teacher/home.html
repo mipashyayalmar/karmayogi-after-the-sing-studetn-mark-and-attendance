@@ -1,0 +1,215 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block title %}KIT Management System{% endblock %}
+
+{% block content %}
+<marquee behavior="" direction="">The KIT management system functions through the Teacher's leadership</marquee>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<a class="btn relative" href="{% url 'inbox' %}">
+   
+</a>
+
+<style>
+    .bg-class {
+        background-color: darkblue;
+    }
+    .bg-student {
+        background-color: violet;
+    }
+</style>
+
+<div class="animated fadeIn">
+    <div class="row">
+
+        <!-- Student Card -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="card text-white bg-student">
+                <div class="card-body pb-0">
+                    <div class="btn-group float-right">
+                        <button class="btn btn-transparent dropdown-toggle p-0" type="button" data-toggle="dropdown">
+                            <i class="icon-settings"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <!-- Student List -->
+                            <a class="dropdown-item" href="{% url 'student-list' %}">Student List</a>
+                        
+                            <!-- Messages Section -->
+                            {% if profile.employee_type == 'employee' and employee.id %}
+                                <a class="dropdown-item position-relative" href="{% url 'employee_messages' employee.id %}">
+                                    <i class="icon-speech"></i> Messages
+                                    <span class="ms-2 text-muted small">
+                                        ({{ total_messages|default:0 }})
+                                    </span>
+                                    {% if total_unread_messages|default:0 > 0 %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger animate__animated animate__bounceIn">
+                                            {{ total_unread_messages }}
+                                        </span>
+                                    {% endif %}
+                                </a>
+                            {% elif profile.employee_type == 'teacher' or profile.employee_type == 'professor' %}
+                                <a class="dropdown-item position-relative" href="{% url 'inbox' %}">
+                                    <i class="icon-speech"></i> Messages
+                                    {% if unread_messages_count|default:0 > 0 %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger animate__animated animate__bounceIn">
+                                            {{ unread_messages_count }}
+                                        </span>
+                                    {% else %}
+                                        <span class="ms-2 text-muted small">(0)</span>
+                                    {% endif %}
+                                </a>
+                            {% elif profile.employee_type == 'student' %}
+                                <a class="dropdown-item position-relative" href="{% url 'student-inbox' %}">
+                                    <i class="icon-speech"></i> Messages
+                                    {% if unread_count|default:0 > 0 %}
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger animate__animated animate__bounceIn">
+                                            {{ unread_count }}
+                                        </span>
+                                    {% else %}
+                                        <span class="ms-2 text-muted small">(0)</span>
+                                    {% endif %}
+                                </a>
+                            {% endif %}
+                        
+                            <!-- Other Dropdown Options -->
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                        
+                    </div>
+                    <div class="text-value">
+                        <a href="{% url 'student-list' %}" class="btn btn-primary">{{ student }}</a>
+                    </div>
+                    <div>Total Student</div>
+                </div>
+                <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+                    <canvas id="card-chart1" class="chart chartjs-render-monitor" height="70" width="319"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teacher Card -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body pb-0">
+                    <div class="btn-group float-right">
+                        <button class="btn btn-transparent dropdown-toggle p-0" type="button" data-toggle="dropdown">
+                            <i class="icon-settings"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            {% if teacher_count > 0 %}
+                                <a class="dropdown-item" href="{% url 'teacher-list' %}">
+                                    <i class="fa fa-users"></i> {{ teacher_count }} Teachers
+                                </a>
+                            {% else %}
+                                <span class="dropdown-item">No teachers in your department</span>
+                            {% endif %}
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </div>
+                    <div class="text-value">
+                        <a href="{% url 'teacher-profile' teacher.id %}" class="btn btn-primary">{{ teacher }}</a>
+                    </div>
+                    <div>Total Teachers</div>
+                </div>
+                <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+                    <canvas id="card-chart4" class="chart chartjs-render-monitor" height="70" width="319"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Employee Card -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body pb-0">
+                    <div class="btn-group float-right">
+                        <button class="btn btn-transparent dropdown-toggle p-0" type="button" data-toggle="dropdown">
+                            <i class="icon-settings"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="{% url 'employee-list' %}">{{ employee }} Total Employees</a>
+                            <a class="dropdown-item" href="#">Another action</a>
+                            <a class="dropdown-item" href="#">Something else here</a>
+                        </div>
+                    </div>
+                    <div class="text-value">
+                        <a href="{% url 'employee-list' %}" class="btn btn-primary">{{ employee }}</a>
+                    </div>
+                    <div>Total Employees</div>
+                </div>
+                <div class="chart-wrapper mt-3" style="height:70px;">
+                    <canvas id="card-chart3" class="chart chartjs-render-monitor" height="70" width="351"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Class Card -->
+        <div class="col-sm-6 col-lg-3">
+            <div class="card text-white bg-class">
+                <div class="card-body pb-0">
+                    <div class="btn-group float-right">
+                        <button class="btn btn-transparent dropdown-toggle p-0" type="button" data-toggle="dropdown">
+                            <i class="icon-settings"></i>
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right">
+                            {% if subject_count > 0 %}
+                                <a class="dropdown-item" href="#">Total Subjects: {{ subject_count }}</a>
+                                {% for subject in total_subjects %}
+                                    <a class="dropdown-item" href="{% url 'subject-detail' subject.id %}">
+                                        <i class="fa fa-angle-double-right" style="font-size:18px;"></i> 
+                                        {{ subject.subject_name }} (Code: {{ subject.subject_code }})
+                                    </a>
+                                {% endfor %}
+                            {% else %}
+                                <a class="dropdown-item" href="#">No subjects allocated</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="text-value">
+                        <a href="{% url 'class-list' %}" class="btn btn-primary">{{ total_class }}</a>
+                    </div>
+                    <div>Total Classes</div>
+                </div>
+                <div class="chart-wrapper mt-3 mx-3" style="height:70px;">
+                    <canvas id="card-chart2" class="chart chartjs-render-monitor" height="70" width="319"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subject Attendance Table -->
+        <div class="table-responsive">
+            <h3>Subject Attendance Details</h3>
+            <table class="table table-striped table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Subject</th>
+                        <th>Total Present</th>
+                        <th>Total Absent</th>
+                        <th>Total Days</th>
+                        <th>Attendance Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject, data in subject_attendance_percentages.items %}
+                        <tr>
+                            <td>{% for subject in total_subjects %}
+                                <a class="dropdown-item" href="{% url 'subject-detail' subject.id %}">
+                                    <i class="fa fa-angle-double-right" style="font-size:18px;"></i> 
+                                    {{ subject.subject_name }} (Code: {{ subject.subject_code }})
+                                </a>
+                            {% endfor %}</td>
+                            <td>{{ data.present }}</td>
+                            <td>{{ data.absent }}</td>
+                            <td>{{ data.total_days }}</td>
+                            <td><a class="dropdown-item" href="{% url 'student-attendance' %}">{{ data.percentage }}%</a></td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5">No attendance data available for your subjects.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

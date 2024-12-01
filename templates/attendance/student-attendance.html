@@ -1,0 +1,236 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="animated fadeIn">
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fa fa-edit"></i> Student Attendance
+        </div>
+        <div class="card-body">
+            <!-- Custom CSS for Charts -->
+            <style>
+                #chart-container {
+                    width: 80%;
+                    margin: 0 auto;
+                    height: 400px; /* Adjusted height */
+                }
+
+                #attendanceChart {
+                    width: 100% !important;
+                    height: 100% !important;
+                }
+            </style>
+
+            <!-- Form to filter attendance -->
+            <form action="" method="GET" class="form-inline mb-3">
+                <div class="form-group mb-2 mr-sm-2">
+                    <label for="reg_class">Class</label>
+                    {{ forms.reg_class }}
+                </div>
+                <div class="form-group mb-2 mr-sm-2">
+                    <label for="session">Session</label>
+                    {{ forms.session }}
+                </div>
+                <div class="form-group mb-2 mr-sm-2">
+                    <label for="attendance_date">Attendance Date (Single)</label>
+                    {{ forms.attendance_date }}
+                </div>
+                <div class="form-group mb-2 mr-sm-2">
+                    <label for="start_date">Start Date</label>
+                    {{ forms.start_date }}
+                </div>
+                <div class="form-group mb-2 mr-sm-2">
+                    <label for="end_date">End Date</label>
+                    {{ forms.end_date }}
+                </div>
+                <div class="form-group mb-2 mr-sm-2">
+                    <label for="search">Name</label>
+                    <input type="text" name="search" id="search" class="form-control" placeholder="Search by name or subject" value="{{ search_query }}" {% if employee_type == "student" %} readonly {% endif %}>
+                </div>
+                <button type="submit" class="btn btn-primary mb-2">
+                    <i class="fa fa-search" aria-hidden="true"></i> Search
+                </button>
+                <div class="form-group mb-2 mr-sm-2">
+                    <label for="subject">Subject</label>
+                    {{ forms.subject }}
+                </div>
+            </form>
+
+            
+            {% if class_info %}
+                <h2 align="center">Attendance for Class {{ class_info.name }}</h2>
+            {% endif %}
+
+            <!-- Attendance Table with Percentile -->
+            <div class="table-responsive"> <!-- Added for scrollable table -->
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Name</th>
+                            <th>Reg No</th>
+                            <th>Class</th>
+                            <th>Roll</th>
+                            <th>Year</th>
+                            <th>Subject</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for attendance in attendances %}
+                            <tr class="{% if attendance.get_status_display == 'Absent' %}bg-danger text-white{% endif %}">
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ attendance.student.student.userprofile.name }}</td>
+                                <td>{{ attendance.student.student.registration_no }}</td>
+                                <td>{{ attendance.select_class.name }}</td>
+                                <td>{{ attendance.student.roll }}</td>
+                                <td>{{ attendance.student.session_year }}</td>
+                                <td>{{ attendance.subject.subject_name }}</td>
+                                <td>{{ attendance.date }}</td>
+                                <td>{{ attendance.timestamp|date:"H:i:s" }}</td>
+                                <td>{{ attendance.get_status_display }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="11" align="center">No attendance records found.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+
+    <style>
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .table th,
+            .table td {
+                white-space: nowrap; /* Prevent text wrapping */
+            }
+        }
+        
+        .bg-danger {
+            background-color: #f8d7da !important;
+            color: #842029 !important;
+        }
+    </style>
+    
+
+
+    <hr>
+
+    {% if class_info %}
+        <h2 align="center">Attendance for Class {{ class_info.name }}</h2>
+    {% endif %}
+    
+    <!-- Attendance Table with Percentile -->
+    <div class="table-responsive"> <!-- Added for scrollable table -->
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th>Total Present</th>
+                    <th>Total Absent</th>
+                    <th>Total Students</th>
+                    <th>Attendance Percentage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for subject, attendance in subject_attendance_percentages.items %}
+                    <tr>
+                        <td>{{ subject }}</td>
+                        <td>{{ attendance.present }}</td>
+                        <td>{{ attendance.absent }}</td>
+                        <td>{{ attendance.total_days }}</td>
+                        <td>{{ attendance.percentage }}%</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Chart Section -->
+    <div id="chart-container">
+        <h3 align="center">Attendance Overview</h3>
+        <canvas id="attendanceChart"></canvas>
+    </div>
+    
+    <style>
+        /* Responsive adjustments */
+        #chart-container {
+            width: 100%;
+            margin: 0 auto;
+            height: 400px; /* Adjust chart height */
+        }
+    
+        @media (max-width: 768px) {
+            #chart-container {
+                height: 300px; /* Adjust height for smaller screens */
+            }
+    
+            .table-responsive {
+                margin-bottom: 20px; /* Add spacing */
+            }
+        }
+    </style>
+    
+    <script>
+        // Parse the JSON data passed from the Django view
+        const subjectAttendanceCounts = JSON.parse('{{ subject_attendance_counts|escapejs }}');
+    
+        // Prepare data arrays for subjects, presents, and absents
+        const labels = Object.keys(subjectAttendanceCounts);
+        const presentData = labels.map(subject => subjectAttendanceCounts[subject].present);
+        const absentData = labels.map(subject => subjectAttendanceCounts[subject].absent);
+    
+        // Chart.js configuration
+        const data = {
+            labels: labels,
+            datasets: [{
+                label: 'Present',
+                data: presentData,
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgb(75, 192, 192)',
+                borderWidth: 1
+            }, {
+                label: 'Absent',
+                data: absentData,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgb(255, 99, 132)',
+                borderWidth: 1
+            }]
+        };
+    
+        const config = {
+            type: 'bar',
+            data: data,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Ensure chart adjusts correctly
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        };
+    
+        // Render the chart
+        new Chart(document.getElementById('attendanceChart'), config);
+    </script>
+    
+        </div>
+    </div>
+</div>
+{% endblock %}

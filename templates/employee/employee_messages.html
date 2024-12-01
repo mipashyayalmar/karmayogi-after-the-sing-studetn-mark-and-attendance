@@ -1,0 +1,34 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <h2>Messages for {{ employee.name }}</h2>
+
+        {% if total_unread > 0 %}
+            <div class="alert alert-info">
+                You have {{ total_unread }} unread messages.
+            </div>
+        {% endif %}
+
+        <div class="messages-list">
+            {% for message in messages %}
+                <div class="message-item {% if not message.is_read %} unread {% endif %}">
+                    <p><strong>From:</strong> {{ message.sender.name }}</p>
+                    <p>{{ message.message_text }}</p>
+
+                    {% if message.image %}
+                        <p><img src="{{ message.image.url }}" alt="Attached image" width="150"></p>
+                    {% endif %}
+
+                    <p><small>Sent on: {{ message.created_at }}</small></p>
+                    {% if not message.is_read %}
+                        <a href="?message_id={{ message.id }}" class="btn btn-info">Mark as Read</a>
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>No messages available.</p>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

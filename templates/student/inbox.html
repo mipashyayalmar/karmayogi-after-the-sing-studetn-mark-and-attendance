@@ -1,0 +1,190 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+    /* Responsive Table Styling */
+    .table-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 12px;
+    }
+
+    th {
+        background-color: #f9fafb;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        color: #6b7280;
+    }
+
+    /* Row hover effect */
+    .message-row {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .message-row:hover {
+        background-color: #f3f4f6;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Unread pulse effect */
+    @keyframes pulse {
+        0%, 100% { background-color: #fee2e2; }
+        50% { background-color: #fecaca; }
+    }
+
+    .unread-pulse {
+        animation: pulse 2s infinite;
+    }
+
+    /* Filter buttons */
+    .filter-buttons button {
+        margin-right: 8px;
+        padding: 8px 12px;
+        font-size: 0.875rem;
+        border-radius: 4px;
+        border: none;
+        transition: background-color 0.3s;
+    }
+
+    .filter-buttons button:hover {
+        background-color: #e5e7eb;
+    }
+
+    @media (max-width: 640px) {
+        table {
+            display: block;
+        }
+
+        thead {
+            display: none;
+        }
+
+        tbody {
+            display: block;
+        }
+
+        tbody tr {
+            display: block;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        tbody td {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        tbody td:last-child {
+            border-bottom: none;
+        }
+
+        tbody td:before {
+            content: attr(data-label);
+            font-weight: bold;
+            color: #374151;
+            margin-right: 8px;
+        }
+    }
+</style>
+
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6">Student Inbox</h1>
+    
+    <!-- Notification Section -->
+    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-md flex justify-between items-center">
+        <p class="text-lg font-medium">
+            You have <span class="font-bold">{{ unread_count }}</span> unread 
+            message{{ unread_count|pluralize }}.
+        </p>
+        
+        <!-- Filter Buttons -->
+        <div class="filter-buttons">
+            <button id="filterAll" class="bg-gray-100 text-gray-700 hover:bg-gray-200">All</button>
+            <button id="filterUnread" class="bg-red-100 text-red-700 hover:bg-red-200">Unread</button>
+            <button id="filterRead" class="bg-green-100 text-green-700 hover:bg-green-200">Read</button>
+        </div>
+    </div>
+
+    {% if messages %}
+    <!-- Responsive Table Container -->
+    <div class="table-container bg-white shadow-md rounded-lg">
+        <table id="messagesTable">
+            <thead>
+                <tr>
+                    <th>Sender</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for message in messages %}
+                <tr class="message-row 
+                    {% if not message.is_read %}unread-pulse{% endif %}" 
+                    data-status="{% if message.is_read %}read{% else %}unread{% endif %}">
+                    <td data-label="Sender">{{ message.sender.username }}</td>
+                    <td data-label="Message">{{ message.message_text|truncatewords:10 }}</td>
+                    <td data-label="Date">{{ message.created_at|date:"M d, Y H:i" }}</td>
+                    <td data-label="Status">
+                        {% if message.is_read %}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">Read</span>
+                        {% else %}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">Unread</span>
+                        {% endif %}
+                    </td>
+                    <td data-label="Actions">
+                        <a href="{% url 'student-read-message' message.id %}" class="text-indigo-600 hover:text-indigo-900">View</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="bg-white shadow-md rounded-lg p-6 text-center">
+        <p class="text-gray-500">No messages found.</p>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const filterAll = document.getElementById('filterAll');
+    const filterUnread = document.getElementById('filterUnread');
+    const filterRead = document.getElementById('filterRead');
+    const messagesTable = document.getElementById('messagesTable');
+    const messageRows = messagesTable.querySelectorAll('.message-row');
+
+    filterAll.addEventListener('click', () => {
+        messageRows.forEach(row => row.style.display = '');
+    });
+
+    filterUnread.addEventListener('click', () => {
+        messageRows.forEach(row => {
+            row.style.display = row.getAttribute('data-status') === 'unread' ? '' : 'none';
+        });
+    });
+
+    filterRead.addEventListener('click', () => {
+        messageRows.forEach(row => {
+            row.style.display = row.getAttribute('data-status') === 'read' ? '' : 'none';
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,105 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<!-- Display success/error messages -->
+{% if messages %}
+    <div class="container mt-2">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header">Filter Students by Class and Session</div>
+    <div class="card-body">
+        <form action="" method="GET" class="form-inline flex-wrap mb-3">
+            <div class="form-group mb-2 mr-sm-2">
+                <label for="reg_class">Class</label>
+                {{ filter_form.reg_class }}
+            </div>
+    
+            <div class="form-group mb-2 mr-sm-2">
+                <label for="session">Session</label>
+                {{ filter_form.session }}
+            </div>
+    
+            <div class="form-group mb-2 mr-sm-2">
+                <label for="search">Search</label>
+                <input type="text" name="search" id="search" class="form-control" placeholder="Search by name or roll" value="{{ search_query }}">
+            </div>
+    
+            <button type="submit" class="btn btn-primary mb-2">
+                <i class="fa fa-search" aria-hidden="true"></i> Search
+            </button>
+        </form>
+        <hr>
+    </div>
+</div>
+
+{% if student_form_pairs %}
+<div class="card mt-3">
+    <div class="card-header">Student List for Adding Marks</div>
+    <div class="card-body">
+        <!-- Top-level form for subject, exam_date, and mark_type -->
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-row mb-3">
+                <div class="col-12 col-md-3 mb-2">
+                    <label for="subject">Subject</label>
+                    <select name="subject" id="subject" class="form-control" required>
+                        {% for subject in subjects %}
+                            <option value="{{ subject.id }}">{{ subject.subject_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-12 col-md-3 mb-2">
+                    <label for="exam_date">Exam Date</label>
+                    <input type="date" name="exam_date" id="exam_date" class="form-control" required>
+                </div>
+                <div class="col-12 col-md-3 mb-2">
+                    <label for="mark_type">Mark Type</label>
+                    <input type="text" name="mark_type" id="mark_type" class="form-control" required>
+                </div>
+                <div class="col-12 col-md-3 mb-2">
+                    <label for="total_score">Total Score</label>
+                    <input type="text" name="total_score" id="total_score" class="form-control" required>
+                </div>
+            </div>
+            <hr>
+
+            <div class="table-responsive"> <!-- Added for scrollable table -->
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Name</th>
+                            <th>Roll</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student, form in student_form_pairs %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ student.student.personal_info.name }}</td>
+                            <td>{{ student.roll }}</td>
+                            <td>
+                                <!-- Added a responsive, scrollable container for the score input -->
+                                <div class="input-group">
+                                    <input type="number" name="score_{{ student.id }}" class="form-control" placeholder="Enter Score" required style="min-width: 100px; overflow-x: auto;">
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-success mt-3">Save Marks</button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,0 +1,219 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="animated fadeIn">
+        <div class="card">
+            <div class="card-header">
+                <i class="fa fa-edit"></i> Teacher List
+            </div>
+    
+            {% if teachers %}
+            <div class="table-responsive">
+                <div class="card-body">
+                    <div class="dataTables_wrapper dt-bootstrap4 no-footer">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6">
+                                <div class="dataTables_length">
+                                    <label>Show
+                                        <select class="custom-select custom-select-sm form-control form-control-sm">
+                                            <option value="10">10</option>
+                                            <option value="25">25</option>
+                                            <option value="50">50</option>
+                                            <option value="100">100</option>
+                                        </select> entries
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div class="dataTables_filter">
+                                    <label>Search:
+                                        <input type="search" class="form-control form-control-sm" placeholder="">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <table class="table table-striped table-bordered datatable">
+                                    <thead>
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Status</th>
+                                            <th>Name</th>
+                                            <th>Gender</th>
+                                            <th>Department</th>
+                                            {% if profile.employee_type == 'professor' %}
+                                            <th>Detail</th>
+                                            <th>Edit</th>
+                                            <th>Delete</th>
+                                            {% endif %}
+                                            <th>Send Message</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for teacher in teachers %}
+                                        <tr>
+                                            <td>{{ forloop.counter }}</td>
+                                            <td>{{ teacher.administration }}</td>
+                                            <td>{{ teacher.name }}</td>
+                                            <td>{{ teacher.gender }}</td>
+                                            <td>
+                                                <span class="badge badge-warning">{{ teacher.job.department }}</span>
+                                            </td>
+                                            {% if profile.employee_type == 'professor' %}
+                                            <td>
+                                                <a class="btn btn-success" href="{% url 'teacher-profile' teacher.id %}">
+                                                    <i class="fa fa-search-plus"></i>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-info" href="{% url 'teacher-edit' teacher.id %}">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a class="btn btn-danger" href="{% url 'teacher-delete' teacher.id %}" onclick="return confirmDelete(event);">
+                                                    <i class="fa fa-trash-o"></i>
+                                                </a>
+                                            </td>
+                                            {% endif %}
+                                            <td>
+                                                <!-- Button to trigger modal -->
+                                                <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#messageModal{{ teacher.id }}">
+                                                    Send Message
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+    
+                        <div class="row">
+                            <div class="col-sm-12 col-md-5">
+                                <div class="dataTables_info">Showing 1 to 10 of {{ teachers|length }} entries</div>
+                            </div>
+                            <div class="col-sm-12 col-md-7">
+                                <div class="dataTables_paginate paging_simple_numbers">
+                                    <ul class="pagination">
+                                        <li class="paginate_button page-item previous disabled">
+                                            <a href="#" class="page-link">Previous</a>
+                                        </li>
+                                        <li class="paginate_button page-item active">
+                                            <a href="#" class="page-link">1</a>
+                                        </li>
+                                        <li class="paginate_button page-item">
+                                            <a href="#" class="page-link">2</a>
+                                        </li>
+                                        <li class="paginate_button page-item">
+                                            <a href="#" class="page-link">3</a>
+                                        </li>
+                                        <li class="paginate_button page-item next">
+                                            <a href="#" class="page-link">Next</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="card-body">
+                <h3>No Teacher Found</h3>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <style>
+        @media (max-width: 768px) {
+            .dataTables_length label,
+            .dataTables_filter label {
+                display: flex;
+                flex-direction: column;
+            }
+    
+            .dataTables_length select,
+            .dataTables_filter input {
+                width: 100%;
+                margin-top: 5px;
+            }
+    
+            .table-responsive {
+                overflow-x: auto;
+            }
+    
+            .pagination {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+    
+
+    <!-- Modal for sending message -->
+    {% for teacher in teachers %}
+    <div class="modal fade" id="messageModal{{ teacher.id }}" tabindex="-1" role="dialog" aria-labelledby="messageModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="messageModalLabel">Send Message to {{ teacher.name }}</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form inside modal -->
+                    <form id="sendMessageForm{{ teacher.id }}" method="POST" action="{% url 'send-message' teacher.id %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <textarea name="message_text" class="form-control" rows="4" placeholder="Type your message here..."></textarea>
+                        <input type="file" name="image" class="form-control mt-2" accept="image/*">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <!-- Submit Button that submits the form -->
+                    <button type="submit" class="btn btn-primary" form="sendMessageForm{{ teacher.id }}">Send Message</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% block extra_scripts %}
+    <script>
+        function confirmDelete(event) {
+            if (!confirm("Are you sure you want to delete this teacher?")) {
+                event.preventDefault();
+                return false;
+            }
+            return true;
+        }
+
+        $(document).ready(function() {
+            // Initialize data table
+            $('#DataTables_Table_0').DataTable({
+                paging: true,
+                lengthChange: true,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false
+            });
+        });
+    </script>
+    {% endblock %}
+{% endblock %}

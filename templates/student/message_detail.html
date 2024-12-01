@@ -1,0 +1,118 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Message Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .image-thumbnail {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .image-thumbnail:hover {
+            transform: scale(1.05);
+        }
+        #imageModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.9);
+        }
+        #modalImage {
+            margin: auto;
+            display: block;
+            max-width: 90%;
+            max-height: 90%;
+            animation: zoomIn 0.4s ease;
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.7); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="container mx-auto bg-white shadow-lg rounded-lg p-6 fade-in">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">
+                Message from {{ message.sender.username }}
+            </h1>
+        </div>
+
+        <div class="space-y-4 bg-gray-50 p-4 rounded-lg">
+            <p class="text-gray-600">
+                <strong class="text-gray-800">Received:</strong> 
+                {{ message.created_at|date:"F d, Y H:i" }}
+            </p>
+            
+            <div class="border-l-4 border-blue-500 pl-4 py-2 bg-white">
+                <p class="text-gray-700 text-lg">
+                    {{ message.message_text }}
+                </p>
+            </div>
+
+            {% if message.image %}
+            <div class="mt-4">
+                <p class="bg-blue-100 text-blue-800 px-3 py-2 font-semibold">
+                    Attachment
+                </p>
+                <img 
+                    id="attachmentImage"
+                    src="{{ message.image.url }}" 
+                    alt="Message Attachment" 
+                    class="image-thumbnail w-full max-h-64 object-cover rounded-lg"
+                >
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="mt-6 flex justify-between items-center">
+            <a 
+                href="{% url 'student-inbox' %}" 
+                class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+            >
+                ← Back to Inbox
+            </a>
+        </div>
+    </div>
+
+    <div id="imageModal" onclick="closeModal()">
+        <img id="modalImage" src="" alt="Full Size Image">
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const thumbnail = document.getElementById('attachmentImage');
+            const modal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+
+            if (thumbnail) {
+                thumbnail.addEventListener('click', () => {
+                    modal.style.display = 'flex';
+                    modal.style.alignItems = 'center';
+                    modal.style.justifyContent = 'center';
+                    modalImage.src = thumbnail.src;
+                });
+            }
+        });
+
+        function closeModal() {
+            document.getElementById('imageModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
+{%endblock%}

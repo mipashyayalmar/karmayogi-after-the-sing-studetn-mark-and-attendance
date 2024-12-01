@@ -1,0 +1,54 @@
+from django.http import JsonResponse
+from webpush.models import PushInformation
+import json
+
+def save_subscription(request):
+    if request.method == 'POST':
+        try:
+            # Parse the subscription data from the request
+            data = json.loads(request.body)
+
+            # Ensure a PushInformation object exists for the user
+            subscription, created = PushInformation.objects.get_or_create(
+                user=request.user, 
+                defaults={"subscription_info": data}
+            )
+
+            # If it already exists, update the subscription
+            if not created:
+                subscription.subscription_info = data
+                subscription.save()
+
+            return JsonResponse({"success": True, "message": "Subscription saved."})
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    return JsonResponse({"error": "Invalid request method."}, status=400)
+from django.http import JsonResponse
+from webpush import send_user_notification
+from django.contrib.auth.models import User
+
+def send_notification(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            
+            recipient_username = data.get('recipient_username')  # Pass recipient username in the payload
+            payload = {
+                "head": data.get('head', 'New Message'),
+                "body": data.get('body', 'You have a new message!'),
+                "icon": data.get('icon', '/static/icons/message-icon.png'),
+                "url": data.get('url', '/'),
+            }
+
+            # Fetch the recipient user
+            recipient = User.objects.get(username=recipient_username)
+            
+            # Send notification to the recipient
+            send_user_notification(user=recipient, payload=payload, ttl=1000)
+            
+            return JsonResponse({"success": True, "message": "Notification sent."})
+        except User.DoesNotExist:
+            return JsonResponse({"error": "Recipient not found."}, status=404)
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=400)
+    return JsonResponse({"error": "Invalid request method."}, status=400)

@@ -1,0 +1,98 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Permission Denied</title>
+  <style>
+   
+
+    /* Container styles */
+    .container {
+      max-width: 800px;
+      padding: 40px;
+      background-color: #fff;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      text-align: center;
+      position: relative;
+      margin-top: 11%;
+    }
+
+    /* Heading styles */
+    h2 {
+      color: #333;
+      font-size: 24px;
+      margin-top: 0;
+    }
+
+    /* Paragraph styles */
+    p {
+      color: #555;
+      line-height: 1.5;
+    }
+
+    /* List styles */
+    ul {
+      list-style-type: none;
+      padding: 0;
+      text-align: left;
+    }
+
+    li {
+      margin-bottom: 10px;
+    }
+
+    /* Strong styles */
+    strong {
+      color: #333;
+    }
+
+    /* Red flag popup */
+    .red-flag {
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      background-color: #ff0000;
+      color: #fff;
+      padding: 10px 15px;
+      border-radius: 50%;
+      font-weight: bold;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.2);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+  
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="red-flag">!</div>
+    <h2>Permission Denied</h2>
+    <p>You do not have permission to view this page due to some previous restrictions.</p>
+    <p>Your profile type: <strong>{{ profile_type|title }}</strong></p>
+    <p>Details:</p>
+    <ul>
+      <li><strong>Name:</strong> {{ user_profile.name }}</li>
+      <li><strong>Employee Type:</strong> {{ user_profile.employee_type|title }}</li>
+    </ul>
+  </div>
+</body>
+</html>
+{% endblock content %}

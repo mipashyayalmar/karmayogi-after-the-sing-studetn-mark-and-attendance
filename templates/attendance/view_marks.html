@@ -1,0 +1,79 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+
+<!-- Display any messages -->
+{% if messages %}
+    <div class="container mt-2">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header">Filter Students by Class, Session, and Mark Type</div>
+    <div class="card-body">
+        <form method="get" action="">
+            <div class="form-group">
+                <label for="reg_class">Class</label>
+                {{ filter_form.reg_class }}
+            </div>
+            <div class="form-group">
+                <label for="session">Session</label>
+                {{ filter_form.session }}
+            </div>
+            <div class="form-group">
+                <label for="subject">Subject</label>
+                {{ filter_form.subject }}
+            </div>
+            <div class="form-group">
+                <label for="mark_type">Mark Type</label>
+                {{ filter_form.mark_type }}
+            </div>
+            <div class="form-group">
+                <label for="search">Search</label>
+                <input type="text" name="search" id="search" class="form-control" placeholder="Search by name or subject" value="{{ search_query }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+    </div>
+</div>
+
+{% if marks_data %}
+<div class="card mt-3">
+    <div class="card-header">Submitted Marks</div>
+    <div class="card-body">
+        <table class="table table-responsive-sm">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Student Name</th>
+                    <th>Subject</th>
+                    <th>Exam Type</th>
+                    <th>Score</th>
+                    <th>Total Score</th>
+                    <th>Exam Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mark in marks_data %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ mark.student.student.personal_info.name }}</td>
+                    <td>{{ mark.subject.subject_name }}</td>
+                    <td>{{ mark.mark_type }}</td>
+                    <td>{{ mark.score }}</td>
+                    <td>{{ mark.total_score}}</td>
+                    <td>{{ mark.exam_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<p>No marks found for the selected filters.</p>
+{% endif %}
+
+{% endblock %}

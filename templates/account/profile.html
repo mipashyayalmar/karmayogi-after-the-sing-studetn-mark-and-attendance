@@ -1,0 +1,122 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="card">
+        <div class="card-header">
+            <a href="{{ profile.photo.url }}">
+                <div class="row justify-content-center">
+                    {% if profile.photo %}
+                        <img class="img-fluid rounded-circle" style="height: 200px; width: 200px; margin: auto;" src="{{ profile.photo.url }}" alt="Profile Photo">
+                    {% else %}
+                        <img class="img-fluid rounded-circle" style="height: 200px; width: 200px; margin: auto;" src="{% static 'images/default-photo.png' %}" alt="Default Photo">
+                    {% endif %}
+                </div>
+            </a>
+        </div>
+
+        <div class="card-body">
+            <div class="row justify-content-center">
+                {% if profile.employee_type|title == "Admin" %}
+                    <h2>Welcome {{ request.user|title }} (Admin)</h2>
+                {% elif profile.employee_type|title == "Professor" %}
+                    <h2>Welcome {{ request.user|upper }} (Professor Sir)</h2>
+                {% elif profile.employee_type|title == "Teacher" %}
+                    <h2>Welcome {{ request.user|title }} (Sir)</h2>
+                {% elif profile.employee_type|title == "Register" %}
+                    <h2>Welcome {{ request.user|title }} (Register)</h2>
+                {% else %}
+                    <h2>Welcome {{ request.user|title }}</h2>
+                {% endif %}
+            </div>
+            <hr>
+            <div class="table-responsive">
+                <div class="row justify-content-center">
+                    <div class="profile-box">
+                        <pre>Name            : {{ profile.name|title }}</pre>
+                        <pre>Gender          : {{ profile.gender|title }}</pre>
+                        <pre>Employee Type   : {{ profile.employee_type|title }}</pre>
+                        <pre>Date of Birth   : {{ profile.date_of_birth }}</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Center and animate the profile box */
+        .profile-box {
+            background-color: #fff;
+            border: 2px solid #ccc;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            font-size: 18px;
+            width: 100%;
+            max-width: 600px;
+            opacity: 0;
+            transform: translateY(-30px);
+            animation: fadeInUp 0.8s ease-out forwards;
+            margin-top: 20px;
+        }
+    
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    
+        /* Style for the page background */
+        body {
+            background-color: #f7f7f7;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+    
+        /* Ensure proper spacing and centering */
+        .card {
+            margin-top: 50px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    
+        /* Ensure the profile photo is centered and responsive */
+        .card-header img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 50%;
+        }
+    
+        /* Make text larger on small devices */
+        @media (max-width: 576px) {
+            .profile-box {
+                padding: 15px;
+                font-size: 16px;
+            }
+    
+            .card-header img {
+                height: 150px;
+                width: 150px;
+            }
+    
+            h2 {
+                font-size: 20px;
+            }
+        }
+    
+        /* For medium devices (tablets and below) */
+        @media (max-width: 768px) {
+            .card-header img {
+                height: 180px;
+                width: 180px;
+            }
+    
+            h2 {
+                font-size: 24px;
+            }
+        }
+    </style>
+    
+{% endblock %}

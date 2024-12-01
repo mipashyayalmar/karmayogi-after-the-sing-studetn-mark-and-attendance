@@ -1,0 +1,129 @@
+
+{% extends 'base/base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Inbox</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .message-row {
+            transition: all 0.3s ease;
+        }
+        .message-row:hover {
+            transform: translateX(10px);
+            background-color: rgba(243, 244, 246, 0.7);
+        }
+        .unread {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { background-color: #f8d7da; }
+            50% { background-color: #ffdddd; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .truncate {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 text-blue-700 rounded-md">
+        <p class="text-lg font-medium">
+            You have <span class="font-bold">{{ unseen_count }}</span> unseen 
+            message{{ unseen_count|pluralize }}.
+        </p>
+    </div>
+    <div class="container mx-auto bg-white shadow-lg rounded-lg p-6 fade-in">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold text-gray-700">Inbox</h1>
+            <a href="{% url 'teacher-list' %}" 
+               class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors">
+                Back to Teacher List
+            </a>
+        </div>
+
+        {% if messages %}
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse bg-gray-50 rounded-lg overflow-hidden shadow-sm">
+                <thead>
+                    <tr class="bg-gray-200">
+                        <th class="p-3 text-left text-sm font-semibold text-gray-700">Sender</th>
+                        <th class="p-3 text-left text-sm font-semibold text-gray-700">Message</th>
+                        <th class="p-3 text-left text-sm font-semibold text-gray-700">Date</th>
+                        <th class="p-3 text-left text-sm font-semibold text-gray-700">Status</th>
+                        <th class="p-3 text-left text-sm font-semibold text-gray-700">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for message in messages %}
+                    <tr class="border-b hover:bg-gray-100 transition-colors {% if not message.is_read %}bg-red-50{% endif %}">
+                        <td class="p-3">
+                            <span class="font-semibold text-gray-700">
+                                {{ message.sender.username }}
+                            </span>
+                        </td>
+                        <td class="p-3">
+                            <p class="text-gray-600 truncate">
+                                {{ message.message_text|truncatewords:10 }}
+                            </p>
+                        </td>
+                        <td class="p-3 text-sm text-gray-500">
+                            {{ message.created_at|date:"M d, Y, h:i A" }}
+                        </td>
+                        <td class="p-3">
+                            <span class="{% if message.is_read %}text-green-600{% else %}text-red-600 font-bold{% endif %}">
+                                {{ message.is_read|yesno:"Read,Unread" }}
+                            </span>
+                        </td>
+                        <td class="p-3">
+                            <a href="{% url 'read-message' message.id %}" 
+                               class="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors text-sm">
+                                View
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-gray-500 text-center p-4">No messages found.</p>
+        {% endif %}
+        
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const rows = document.querySelectorAll('.message-row');
+            
+            rows.forEach(row => {
+                row.addEventListener('click', (e) => {
+                    if (!e.target.closest('a')) {
+                        const messageId = row.dataset.messageId;
+                        window.location.href = `/message/${messageId}`;
+                    }
+                });
+
+                row.querySelector('a').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
+{%endblock%}

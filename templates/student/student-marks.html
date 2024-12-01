@@ -1,0 +1,50 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header"><a style="text-decoration:none;" href="{% url 'student-list' %}"> Student Marks</a></div>
+    <div class="card-body">
+        <form method="get" action="">
+            <div class="form-group">
+                <label for="search">Search</label>
+                <input type="text" name="search" id="search" class="form-control" placeholder="Search by name or subject" value="{{ search_query }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </form>
+    </div>
+</div>
+
+{% if marks_data %}
+<div class="card mt-3">
+    <div class="card-header">Marks</div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Subject</th>
+                    <th>Exam Type</th>
+                    <th>Score</th>
+                    <th>Total Score</th>
+                    <th>Exam Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for mark in marks_data %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ mark.subject.subject_name }}</td>
+                    <td>{{ mark.mark_type }}</td>
+                    <td>{{ mark.score }}</td>
+                    <td>{{ mark.total_score }}</td>
+                    <td>{{ mark.exam_date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<p>No marks found for the selected filters.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,127 @@
+{% extends 'base/base.html' %}
+{% load static %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Message Details</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        /* Image Zoom Styles */
+        .zoomable-image {
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        .zoomable-image:hover {
+            opacity: 0.8;
+        }
+        .image-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            cursor: pointer;
+        }
+        .image-modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+            transition: transform 0.3s ease;
+        }
+        .image-modal.show {
+            display: flex;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="container mx-auto bg-white shadow-lg rounded-lg p-6 fade-in">
+        <div class="mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">
+                Message from {{ message.sender.username }}
+            </h1>
+        </div>
+
+        <div class="space-y-4 bg-gray-50 p-4 rounded-lg">
+            <p class="text-gray-600">
+                <strong class="text-gray-800">Received:</strong> 
+                {{ message.created_at|date:"F d, Y H:i" }}
+            </p>
+            
+            <div class="border-l-4 border-blue-500 pl-4 py-2 bg-white">
+                <p class="text-gray-700 text-lg">
+                    {{ message.message_text }}
+                </p>
+            </div>
+
+            {% if message.image %}
+            <div class="attachment-container mt-4 rounded-lg overflow-hidden shadow-md">
+                <p class="bg-blue-100 text-blue-800 px-3 py-2 font-semibold">
+                    Attachment
+                </p>
+                <img 
+                    src="{{ message.image.url }}" 
+                    alt="Message Attachment" 
+                    class="w-full max-h-96 object-cover zoomable-image"
+                >
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="mt-6 flex justify-between items-center">
+            <a 
+                href="{% url 'inbox' %}" 
+                class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+            >
+                ← Back to Inbox
+            </a>
+            <div class="text-sm text-gray-500">
+                {% if not message.is_read %}
+                    <span class="text-red-500">• Unread</span>
+                {% else %}
+                    <span class="text-green-500">• Read</span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Modal -->
+    <div class="image-modal">
+        <img class="image-modal-content" src="" alt="Enlarged Image">
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const images = document.querySelectorAll('.zoomable-image');
+        const imageModal = document.querySelector('.image-modal');
+        const modalImage = document.querySelector('.image-modal-content');
+
+        images.forEach(image => {
+            image.addEventListener('click', function() {
+                modalImage.src = this.src;
+                imageModal.classList.add('show');
+            });
+        });
+
+        imageModal.addEventListener('click', function() {
+            this.classList.remove('show');
+        });
+    });
+    </script>
+</body>
+</html>
+{% endblock %}

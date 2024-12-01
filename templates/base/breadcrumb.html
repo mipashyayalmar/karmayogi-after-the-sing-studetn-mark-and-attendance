@@ -1,0 +1,109 @@
+{% load static %}
+<ol class="breadcrumb">
+    <li class="breadcrumb-item"><a href="/">Home</a></li>
+    
+    {% if profile.employee_type == 'teacher' %}
+        <li class="breadcrumb-item"><a href="/">Teacher Panel</a></li>
+    {% elif profile.employee_type == 'professor' %}
+        <li class="breadcrumb-item"><a href="/">Professor Panel</a></li>
+    {% elif profile.employee_type == 'student' %}
+        <li class="breadcrumb-item"><a href="/">Student Panel</a></li>
+    {% elif profile.employee_type == 'employee' %}
+        <li class="breadcrumb-item"><a href="/">Employee Panel</a></li>
+    {% else %}
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+    {% endif %}
+    
+    <li class="breadcrumb-item active">Dashboard</li>
+
+    
+
+    <!-- Breadcrumb Menu -->
+    <li class="breadcrumb-menu d-md-down-none">
+        <div class="btn-group" role="group" aria-label="Button group">
+    
+            <!-- For employee type 'employee' -->
+            {% if profile.employee_type == 'employee' and employee.id %}
+                <a class="btn position-relative" href="{% url 'employee_messages' employee.id %}">
+                    <i class="icon-speech"></i>
+                    <span class="ms-2 text-muted small">
+                        ({{ total_messages|default:0 }})
+                    </span>
+                    {% if total_unread_messages|default:0 > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger animate__animated animate__bounceIn">
+                            {{ total_unread_messages }}
+                        </span>
+                    {% else %}
+                        <span class="ms-2 text-muted small">
+                            (0)
+                        </span>
+                    {% endif %}
+                </a>
+            
+            <!-- For employee type 'teacher' or 'professor' -->
+            {% elif profile.employee_type == 'teacher' or profile.employee_type == 'professor' %}
+                <a class="btn position-relative" href="{% url 'inbox' %}">
+                    <i class="icon-speech"></i>&nbsp;&nbsp;
+                    {% if unread_messages_count|default:0 > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger animate__animated animate__bounceIn">
+                            {{ unread_messages_count }}
+                        </span>
+                    {% else %}
+                        <span class="ms-2 text-muted small">
+                            (0)
+                        </span>
+                    {% endif %}
+                </a>
+            
+            <!-- For employee type 'student' -->
+            {% elif profile.employee_type == 'student' %}
+                <a class="btn position-relative" href="{% url 'student-inbox' %}">
+                    <i class="icon-speech"></i>&nbsp;&nbsp;
+                    {% if unread_count|default:0 > 0 %}
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger animate__animated animate__bounceIn">
+                            {{ unread_count }}
+                        </span>
+                    {% else %}
+                        <span class="ms-2 text-muted small">
+                            (0)
+                        </span>
+                    {% endif %}
+                </a>
+            {% endif %}
+            
+            <!-- Dashboard Link -->
+            <a class="btn position-relative" href="#">
+                <i class="icon-graph"></i>
+                <span class="ms-1">Dashboard</span>
+                {% if total_hits|default:0 > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success animate__animated animate__bounceIn">
+                        {{ total_hits }}
+                    </span>
+                {% else %}
+                    <span class="ms-2 text-muted small">
+                        (0 hits)
+                    </span>
+                {% endif %}
+            </a>
+    
+            <!-- Settings Link -->
+            <a class="btn position-relative" href="#">
+                <i class="icon-settings"></i>
+                <span class="ms-1">Settings</span>
+                {% if pending_settings|default:0 > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning animate__animated animate__bounceIn">
+                        {{ pending_settings }}
+                    </span>
+                {% else %}
+                    <span class="ms-2 text-muted small">
+                        (0 pending)
+                    </span>
+                {% endif %}
+            </a>
+    
+        </div>
+    </li>
+    
+    {% block breadcrumb %}
+    {% endblock %}
+</ol>

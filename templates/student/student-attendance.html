@@ -1,0 +1,115 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<div class="animated fadeIn">
+    <div class="card mb-3">
+        <div class="card-header">
+            <i class="fa fa-edit"></i><a style="text-decoration:none;" href="{% url 'student-list' %}"> Student Attendance</a>
+        </div>
+        <div class="card-body">
+            <!-- Custom CSS for Charts -->
+            <style>
+                #chart-container {
+                    width: 80%;
+                    margin: 0 auto;
+                    height: 400px;
+                }
+
+                #attendanceChart {
+                    width: 100% !important;
+                    height: 100% !important;
+                }
+            </style>
+
+           
+
+            <!-- Attendance Summary Table -->
+            <hr>
+
+            <h2 align="center">Class Attendance Summary</h2>
+
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Subject</th>
+                            <th>Total Present</th>
+                            <th>Total Absent</th>
+                            <th>Total Day's</th>
+                            <th>Attendance Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for subject, attendance in subject_attendance_percentages.items %}
+                            <tr>
+                                <td>{{ subject }}</td>
+                                <td>{{ attendance.present }}</td>
+                                <td>{{ attendance.absent }}</td>
+                                <td>{{ attendance.total_days }}</td>
+                                <td>{{ attendance.percentage }}%</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Chart Section -->
+            <div id="chart-container">
+                <h3 align="center">Attendance Overview</h3>
+                <canvas id="attendanceChart"></canvas>
+            </div>
+
+            <script>
+                const subjectAttendanceCounts = JSON.parse('{{ subject_attendance_counts|escapejs }}');
+
+                const labels = Object.keys(subjectAttendanceCounts);
+                const presentData = labels.map(subject => subjectAttendanceCounts[subject].present);
+                const absentData = labels.map(subject => subjectAttendanceCounts[subject].absent);
+
+                const data = {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Present',
+                            data: presentData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgb(75, 192, 192)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Absent',
+                            data: absentData,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgb(255, 99, 132)',
+                            borderWidth: 1
+                        }
+                    ]
+                };
+
+                const config = {
+                    type: 'bar',
+                    data: data,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                };
+
+                new Chart(document.getElementById('attendanceChart'), config);
+            </script>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

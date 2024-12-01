@@ -1,0 +1,47 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<div class="card">
+    <div class="card-header">Student Registration</div>
+    <div class="card-body">
+        <form action="" method="post" enctype="multipart/form-data" id="StudentRegistrationForm">
+            {% csrf_token %}
+            {% if registration_no %}
+                <div class="alert alert-success">
+                    Registration Successful! Your Registration Number is: 
+                    <strong>{{ registration_no }}</strong>
+                </div>
+            {% endif %}
+
+            <div class="form-section">
+                <h5>Academic Information</h5>
+                {{ academic_info_form.as_p }}
+            </div>
+            <div class="form-section">
+                <h5>Personal Information</h5>
+                {{ personal_info_form.as_p }}
+            </div>
+            <div class="form-section">
+                <h5>Address Information</h5>
+                {{ student_address_info_form.as_p }}
+            </div>
+            <div class="form-section">
+                <h5>Guardian Information</h5>
+                {{ guardian_info_form.as_p }}
+            </div>
+            <div class="form-section">
+                <h5>Emergency Contact Details</h5>
+                {{ emergency_contact_details_form.as_p }}
+            </div>
+            <div class="form-section">
+                <h5>Previous Academic Information</h5>
+                {{ previous_academic_info_form.as_p }}
+            </div>
+            <div class="form-section">
+                <h5>Previous Academic Certificate</h5>
+                {{ previous_academic_certificate_form.as_p }}
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
