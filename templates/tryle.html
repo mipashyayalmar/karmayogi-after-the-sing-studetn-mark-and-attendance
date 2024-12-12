@@ -1,222 +1,66 @@
-{% else %}
-        
-        <ul class="nav">
-            <li class="nav-item">
-                <a class="nav-link" href="/"><i class="icon-speedometer"></i>HOME</a>
-            </li>
-            <!-- Administration Section Start -->
-            <li class="nav-item nav-dropdown">
-             <a class="nav-link nav-dropdown-toggle" href="/">
-                 <i class="nav-icon icon-puzzle"></i>Administration</a>
-             <ul class="nav-dropdown-items">
-                 <li class="nav-item">
-                     <a class="nav-link" href="/"> class="fa fa-plus-circle"></i>Add Designation</a>
-                 </li>
-                 <li class="nav-item">
-                     <a class="nav-link" href="/"> class="fa fa-plus-circle"></i>Add District</a>
-                 </li>
-                 <li class="nav-item">
-                     <a class="nav-link" href="/"> class="fa fa-plus-circle"></i>Add Taluika</a>
-                 </li>
-                 <li class="nav-item">
-                     <a class="nav-link" href="/"> class="fa fa-plus-circle"></i>Add Village</a>
-                 </li>
-             </ul>
-           </li>
-           <!-- Administration Section END -->
+<div class="previous_academic_information">
+    <div class="row">
+      <h2 class="mx-auto">Necessary Documents</h2>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="table-responsive">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Document</th>
+              <th>File</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="scrollable-column">Birth Certificate</td>
+              <td>{{ student.previous_academic_certificate.birth_certificate }}</td>
+            </tr>
+            <tr>
+              <td class="scrollable-column">Release Letter</td>
+              <td>{{ student.previous_academic_certificate.release_letter }}</td>
+            </tr>
+            <tr>
+              <td class="scrollable-column">Testimonial</td>
+              <td>{{ student.previous_academic_certificate.testimonial }}</td>
+            </tr>
+            <tr>
+              <td class="scrollable-column">Marksheet</td>
+              <td>{{ student.previous_academic_certificate.marksheet }}</td>
+            </tr>
+            <tr>
+              <td class="scrollable-column">Stipend Certificate</td>
+              <td>{{ student.previous_academic_certificate.stipen_certificate }}</td>
+            </tr>
+            <tr>
+              <td class="scrollable-column">Other Certificate</td>
+              <td>{{ student.previous_academic_certificate.other_certificate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 
-           <!-- Academic Section START -->
-           <li class="nav-item nav-dropdown">
-            <a class="nav-link nav-dropdown-toggle" href="/">
-                <i class="nav-icon icon-puzzle"></i>Academic</a>
-            <ul class="nav-dropdown-items">
-              <li class="nav-item">
-                  <a class="nav-link" href="/">
-                      <i class="fa fa-plus-circle"></i>Add Department</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="/">
-                      <i class="fa fa-plus-circle"></i>Create Class</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="/">
-                      <i class="fa fa-plus-circle"></i>Create Section</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="/">
-                      <i class="fa fa-plus-circle"></i>Academic Year's</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="/">
-                      <i class="fa fa-plus-circle"></i>Create Shift</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="/">
-                      <i class="fa fa-plus-circle"></i>Guide Teacher</a>
-              </li>
-            </ul>
-          </li>
-          <!-- Academic Section END -->
 
-           <!-- Teacher Section START -->
-           <li class="nav-item nav-dropdown">
-            <a class="nav-link nav-dropdown-toggle" href="/">
-                <i class="nav-icon icon-puzzle"></i>Teacher</a>
-            <ul class="nav-dropdown-items">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">
-                        <i class="fa fa-plus-circle"></i>Teacher Registration</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/">
-                        <i class="fa fa-list"></i>Teacher List</a>
-                </li>
-            </ul>
-          </li>
-          <!-- Teacher Section END -->
 
-            <!-- Class Section START -->
-            <li class="nav-item nav-dropdown">
-             <a class="nav-link nav-dropdown-toggle" href="/">
-                 <i class="nav-icon icon-puzzle"></i>Class</a>
-             <ul class="nav-dropdown-items">
-               <li class="nav-item">
-                   <a class="nav-link" href="/">
-                       <i class="fa fa-plus-circle"></i>Class Registration</a>
-               </li>
-               <li class="nav-item">
-                   <a class="nav-link" href="/">
-                       <i class="fa fa-list"></i>Class List</a>
-               </li>
-             </ul>
-           </li>
-           <!-- Class Section END -->
 
-            <!-- Student Section START -->
-            <li class="nav-item nav-dropdown">
-             <a class="nav-link nav-dropdown-toggle" href="/">
-                 <i class="nav-icon icon-puzzle"></i>Student</a>
-             <ul class="nav-dropdown-items">
-                 <li class="nav-item">
-                     <a class="nav-link" href="/">
-                         <i class="fa fa-plus-circle"></i>Student Registration</a>
-                 </li>
-                 <li class="nav-item">
-                     <a class="nav-link" href="/">
-                         <i class="fa fa-list"></i>Student List</a>
-                 </li>
-                 <li class="nav-item">
-                     <a class="nav-link" href="/">
-                         <i class="fa fa-search-plus"></i>Student Search</a>
-                 </li>
-             </ul>
-           </li>
-           <!-- Student Section END -->
 
-           <!-- Enroll Student Section START -->
-        <li class="nav-item nav-dropdown">
-            <a class="nav-link nav-dropdown-toggle" href="/">
-                <i class="nav-icon icon-puzzle"></i>Enroll Student</a>
-            <ul class="nav-dropdown-items">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">
-                        <i class="fa fa-plus-circle"></i>Student Enrolled</a>
-                    <a class="nav-link" href="/"> %}">
-                        <i class="fa fa-list"></i>Enrolled Student List</a>
-                </li>
-            </ul>
-          </li>
-          <!-- Enroll Student Section END -->
-
-           <!-- Employee Section START -->
-           <li class="nav-item nav-dropdown">
-            <a class="nav-link nav-dropdown-toggle" href="/">
-                <i class="nav-icon icon-puzzle"></i>Employee</a>
-            <ul class="nav-dropdown-items">
-                <li class="nav-item">
-                    <a class="nav-link" href="/">
-                        <i class="fa fa-plus-circle"></i>Add Employee</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/">
-                        <i class="fa fa-list"></i>Employee List</a>
-                </li>
-            </ul>
-          </li>
-          <!-- Employee Section END -->
-
-          <!-- Result Section START -->
-          <li class="nav-item nav-dropdown">
-           <a class="nav-link nav-dropdown-toggle" href="/">
-               <i class="nav-icon icon-puzzle"></i>Subject detail</a>
-           <ul class="nav-dropdown-items">
-               <li class="nav-item">
-                   <a class="nav-link" href="/">
-                       <i class="fa fa-plus-circle"></i>Add Subject</a>
-               </li>
-               <li class="nav-item">
-                   <a class="nav-link" href="/">
-                       <i class="fa fa-list"></i>Subject List</a>
-               </li>
-           </ul>
-         </li>
-         <!-- Result Section END -->
-
-         <!-- Attendence Report Section START -->
-         <li class="nav-item nav-dropdown">
-            <a class="nav-link nav-dropdown-toggle" href="/">
-                <i class="nav-icon icon-puzzle"></i>Attendence Report</a>
-            <ul class="nav-dropdown-items">
-              <li class="nav-item">
-                  <a class="nav-link" href="/">
-                      <i class="fa fa-plus-circle"></i>Add Attendence</a>
-              </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/">
-                        <i class="fa fa-plus-circle"></i>Student Attendence</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" href="/">
-                      <i class="fa fa-plus-circle"></i>Add marks</a>
-              </li>
-              <li class="nav-item">
-                  <a class="nav-link" href="/">
-                  <i class="fa fa-plus-circle"></i>Search Marks</a>
-              </li>
-            </ul>
-          </li>
-        <!-- Attendence Report Section END -->
-
-       <!-- Holiday Section START -->
-       <li class="nav-item nav-dropdown">
-        <a class="nav-link nav-dropdown-toggle" href="/">
-            <i class="nav-icon icon-puzzle"></i>Holiday</a>
-        <ul class="nav-dropdown-items">
-            <li class="nav-item">
-                <a class="nav-link" href="/">
-                    <i class="nav-icon icon-puzzle"></i>Student List</a>
-            </li>
-        </ul>
-      </li>
-      <!-- Holiday Section END -->
-
-        <!-- Event Section START -->
-        <li class="nav-item nav-dropdown">
-         <a class="nav-link nav-dropdown-toggle" href="/">
-             <i class="nav-icon icon-puzzle"></i>Event</a>
-         <ul class="nav-dropdown-items">
-             <li class="nav-item">
-                 <a class="nav-link" href="/">
-                     <i class="nav-icon icon-puzzle"></i>Student List</a>
-             </li>
-         </ul>
-       </li>
-       <!-- Event Section END -->
-
-        <!-- User-Manual Section START -->
-        <li class="nav-item nav-dropdown">
-         <a class="nav-link" href="/">
-             <i class="nav-icon icon-puzzle"></i>User-Manual</a>
-       </li>
-       <!-- User-Manual Section END -->
-        </ul>
+   <!-- Previous Academic Information -->
+   <section class="mb-4">
+    <h2 class="text-center">Necessary Documents</h2>
+    <hr>
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <tbody>
+          <tr><th>Birth Certificate</th><td>{{ student.previous_academic_certificate.birth_certificate }}</td></tr>
+          <tr><th>Release Letter</th><td>{{ student.previous_academic_certificate.release_letter }}</td></tr>
+          <tr><th>Testimonial</th><td>{{ student.previous_academic_certificate.testimonial }}td></tr>
+          <tr><th>Marksheet</th><td>{{ student.previous_academic_certificate.marksheet }}</td></tr>
+          <tr><th>Stipend Certificate</th><td>{{ student.previous_academic_certificate.stipen_certificate }}</</td></tr>
+          <tr><th>Other Certificate</th><td>{{ student.previous_academic_certificate.other_certificate }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>

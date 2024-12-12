@@ -1,0 +1,196 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %} KIT Management System - Incomplete Profile {% endblock %}
+
+{% block content %}
+<div class="incomplete-profile-container">
+    <div class="profile-warning-card animate-slide-in">
+        <div class="warning-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+        </div>
+        <h1>Profile Incomplete</h1>
+        <p>Your profile is missing critical information. Please contact your CC or higher authority to complete the following sections:</p>
+        
+        <div class="incomplete-sections">
+            <div class="section-item">
+                <span class="section-icon">🔒</span>
+                <span class="section-name">Personal Details</span>
+            </div>
+            <div class="section-item">
+                <span class="section-icon">📋</span>
+                <span class="section-name">Professional Information</span>
+            </div>
+            <div class="section-item">
+                <span class="section-icon">🏢</span>
+                <span class="section-name">Department Assignment</span>
+            </div>
+        </div>
+
+        <div class="contact-info">
+            <h3>Contact Your Administrator</h3>
+            <p>Email: support@kitmanagement.com</p>
+            <p>Phone: +91 9172353945</p>
+        </div>
+
+        <a href="#" class="btn-back-dashboard">Return to Dashboard</a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const dashboardButton = document.querySelector('.btn-back-dashboard');
+        
+        dashboardButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            // In a real application, this would redirect to the dashboard
+            alert('Redirecting to Dashboard (Simulated)');
+        });
+    
+        // Optional: Add hover effects to section items
+        const sectionItems = document.querySelectorAll('.section-item');
+        sectionItems.forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                item.style.transform = 'scale(1.02)';
+            });
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = 'scale(1)';
+            });
+        });
+    });
+</script>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
+    :root {
+        --bg-color: #f4f6f9;
+        --card-bg: #ffffff;
+        --warning-color: #ffc107;
+        --text-color: #333;
+        --accent-color: #3498db;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        font-family: 'Inter', sans-serif;
+        margin: 0;
+        padding: 0;
+    }
+
+    .incomplete-profile-container {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* Makes the container take up full height */
+        box-sizing: border-box;
+    }
+
+    .profile-warning-card {
+        background-color: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        text-align: center;
+        transition: all 0.3s ease;
+        width: 100%; /* Full width */
+        max-width: 900px; /* Optional: Limit the max width for better appearance */
+        margin: 20px; /* Add spacing around the card */
+    }
+
+    .warning-icon {
+        width: 100px;
+        height: 100px;
+        background-color: var(--warning-color);
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto 20px;
+        color: white;
+    }
+
+    .warning-icon svg {
+        width: 60px;
+        height: 60px;
+    }
+
+    .incomplete-sections {
+        margin: 20px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .section-item {
+        display: flex;
+        align-items: center;
+        background-color: var(--bg-color);
+        padding: 10px;
+        border-radius: 8px;
+        transition: background-color 0.2s;
+    }
+
+    .section-item:hover {
+        background-color: #e9ecef;
+    }
+
+    .section-icon {
+        margin-right: 10px;
+        font-size: 20px;
+    }
+
+    .contact-info {
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .btn-back-dashboard {
+        display: inline-block;
+        background-color: var(--accent-color);
+        color: white;
+        padding: 12px 24px;
+        text-decoration: none;
+        border-radius: 6px;
+        transition: background-color 0.3s;
+    }
+
+    .btn-back-dashboard:hover {
+        background-color: #2980b9;
+    }
+
+    /* Animations */
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-slide-in {
+        animation: slideIn 0.7s ease-out;
+    }
+</style>
+
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/incomplete-profile.css' %}">
+<style>
+    
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/incomplete-profile.js' %}"></script>
+{% endblock %}

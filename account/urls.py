@@ -21,6 +21,6 @@ urlpatterns = [
      path('student/profiles/', student_view.student_profile, name='student_profiles'),
    path('employee/profiles/', employee_views.employee_profile, name='emplohyee_profiles'),
 
-
+  path('create-profile/', views.create_profile, name='create_profile'),
     
 ]

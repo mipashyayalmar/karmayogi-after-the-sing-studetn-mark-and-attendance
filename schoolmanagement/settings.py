@@ -153,6 +153,15 @@ JAZZMIN_SETTINGS = JAZZMIN_SETTINGS
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+CSRF_FAILURE_VIEW = 'account.views.csrf_failure'
+
+
+import os
+
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, "static"),
+]
+
 
 # Email configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

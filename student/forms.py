@@ -5,6 +5,10 @@ from .models import ClassInfo
 from django import forms
 from .models import AcademicInfo
 
+
+from django import forms
+from .models import AcademicInfo
+
 class AcademicInfoForm(forms.ModelForm):
     class Meta:
         model = AcademicInfo
@@ -14,12 +18,15 @@ class AcademicInfoForm(forms.ModelForm):
             'is_delete'
         ]
         widgets = {
+            'department_info': forms.Select(attrs={'class': 'form-control'}),
             'class_info': forms.Select(attrs={'class': 'form-control'}),
             'session_info': forms.Select(attrs={'class': 'form-control'}),
             'class_teacher': forms.Select(attrs={'class': 'form-control'}),
             'administration': forms.Select(attrs={'class': 'form-control'}),
             'userprofile': forms.Select(attrs={'class': 'form-control'}),
             'registration_no': forms.NumberInput(attrs={'class': 'form-control'}),  # Added widget
+            'stay_mode': forms.Select(attrs={'class': 'form-control'}),  # Widget for stay_mode
+            'traveling_mode': forms.Select(attrs={'class': 'form-control'}),  # Widget for traveling_mode
         }
 
     def __init__(self, *args, **kwargs):
@@ -27,6 +34,12 @@ class AcademicInfoForm(forms.ModelForm):
         self.fields['class_info'].label = 'Select Class'
         self.fields['session_info'].label = 'Academic Year'
         self.fields['registration_no'].label = 'Registration Number (optional)'
+        
+        # Labels for new fields
+        self.fields['stay_mode'].label = 'Stay Mode'  # Label for stay_mode
+        self.fields['traveling_mode'].label = 'Traveling Mode'  # Label for traveling_mode
+
+
 
 class PersonalInfoForm(forms.ModelForm):
     class Meta:
@@ -36,15 +49,30 @@ class PersonalInfoForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'class': 'form-control'}),
             'photo': forms.ClearableFileInput(attrs={'class': 'form-control'}),
             'blood_group': forms.Select(attrs={'class': 'form-control'}),
-            'date_of_birth': forms.TextInput(attrs={'class': 'form-control','type':'date'}),
+            'date_of_birth': forms.TextInput(attrs={'class': 'form-control', 'type': 'date'}),
             'gender': forms.Select(attrs={'class': 'form-control'}),
             'phone_no': forms.TextInput(attrs={'class': 'form-control'}),
             'email': forms.TextInput(attrs={'class': 'form-control'}),
             'birth_certificate_no': forms.TextInput(attrs={'class': 'form-control'}),
             'religion': forms.Select(attrs={'class': 'form-control'}),
-            'nationality': forms.Select(attrs={'class': 'form-control'})
+            'nationality': forms.Select(attrs={'class': 'form-control'}),
+
+            # New Fields
+            'mother_tongue': forms.TextInput(attrs={'class': 'form-control'}),
+            'candidature_type': forms.TextInput(attrs={'class': 'form-control'}),
+            'category': forms.TextInput(attrs={'class': 'form-control'}),
+            'ph_type': forms.TextInput(attrs={'class': 'form-control'}),
+            'linguistic_minority': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        # Pop 'userprofile' from kwargs if passed during initialization
+        userprofile = kwargs.pop('userprofile', None)
+        super(PersonalInfoForm, self).__init__(*args, **kwargs)
+
+        # If a userprofile is passed and associated name exists, set the default name
+        if userprofile and userprofile.name:
+            self.fields['name'].initial = userprofile.name
 class StudentAddressInfoForm(forms.ModelForm):
     class Meta:
         model = StudentAddressInfo
@@ -134,6 +162,7 @@ class EmergencyContactDetailsForm(forms.ModelForm):
             'email': forms.TextInput(attrs={'class': 'form-control'}),
         }
 
+
 class PreviousAcademicInfoForm(forms.ModelForm):
     class Meta:
         model = PreviousAcademicInfo
@@ -145,8 +174,29 @@ class PreviousAcademicInfoForm(forms.ModelForm):
             'gpa': forms.TextInput(attrs={'class': 'form-control'}),
             'board_roll': forms.TextInput(attrs={'class': 'form-control'}),
             'passing_year': forms.TextInput(attrs={'class': 'form-control'}),
+            'ssc_board_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'ssc_passing_year': forms.TextInput(attrs={'class': 'form-control'}),
+            'ssc_seat_no': forms.TextInput(attrs={'class': 'form-control'}),
+            'ssc_maths_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
+            'ssc_total_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
+            'qualifying_exam_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'hsc_board_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'hsc_passing_year': forms.TextInput(attrs={'class': 'form-control'}),
+            'hsc_seat_no': forms.TextInput(attrs={'class': 'form-control'}),
+            'hsc_phy_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
+            'hsc_chem_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
+            'hsc_math_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
+            'hsc_additional_eligibility_subject_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'hsc_subject_percentage_of_additional': forms.NumberInput(attrs={'class': 'form-control'}),
+            'hsc_english_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
+            'hsc_total_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
+            'eligibility_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
+            'cet_roll_no': forms.TextInput(attrs={'class': 'form-control'}),
+            'cet_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
+            'jee_application_no': forms.TextInput(attrs={'class': 'form-control'}),
+            'jee_percentage': forms.NumberInput(attrs={'class': 'form-control'}),
+            'home_university': forms.TextInput(attrs={'class': 'form-control'}),
         }
-
 class PreviousAcademicCertificateForm(forms.ModelForm):
     class Meta:
         model = PreviousAcademicCertificate
@@ -259,11 +309,20 @@ class EnrolledStudentForm(forms.Form):
         return students
 
 class StudentEnrollForm(forms.Form):
-    class_name = forms.ModelChoiceField(queryset=ClassRegistration.objects.all(), widget=forms.Select(attrs={'class': 'form-control'}))
-    roll_no = forms.IntegerField(widget=forms.NumberInput(attrs={'placeholder': 'Enter Roll', 'class': 'form-control'}))
+    class_name = forms.ModelChoiceField(
+        queryset=ClassRegistration.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+    roll_no = forms.IntegerField(
+        widget=forms.NumberInput(attrs={'placeholder': 'Enter Roll', 'class': 'form-control'})
+    )
+    department = forms.ModelChoiceField(
+        queryset=Department.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
     session_year = forms.ModelChoiceField(
-        queryset= Session.objects.all(),
-        widget=forms.Select(attrs={'class':'form-control'})
+        queryset=Session.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'})
     )
 
 class SearchEnrolledStudentForm(forms.Form):

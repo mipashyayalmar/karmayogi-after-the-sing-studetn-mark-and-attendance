@@ -77,7 +77,9 @@
                                     <th>Name</th>
                                     <th>Reg No</th>
                                     <th>Class</th>
+                                    <th>Department</th>
                                     <th>Status</th>
+                                    <th>Roll</th>
                                     <th>Date</th>
                                     {%if profile.employee_type == 'professor' %}
                                     <th>Detail</th>
@@ -93,7 +95,9 @@
                                         <td class="highlight">{{ student.personal_info.name }}</td>
                                         <td class="highlight">{{ student.registration_no }}</td>
                                         <td>{{ student.class_info }}</td>
+                                        <td class="highlight">{{ student.department_info|default:"not defined "|upper }}</td>
                                         <td>{{ student.status }}</td>
+                                        <td class="highlight"> {{ student.enrolledstudent.roll|default:"Not Defined" }}</td>
                                         <td>{{ student.date }}</td>
                                         {%if profile.employee_type == 'professor' %}
                                         <td>

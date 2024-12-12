@@ -1,137 +1,228 @@
 {% extends 'base/base.html' %}
 {% load static %}
+
 {% block content %}
+<div class="container-fluid p-0">
   <div class="card">
-    <div class="card-header">
-      <a href = "{% url 'student-edit' student.registration_no %}"> <div class="row">
-     <img style="height:200px; width:200px; border-radius:50%; margin:auto" src="{{ student.personal_info.photo.url }}" alt="Photo">
-      </div></a>
+    <div class="card-header text-center">
+      <a href="{% url 'student-edit' student.registration_no %}">
+        <img class="rounded-circle mx-auto d-block profile-image" src="{{ student.personal_info.photo.url }}" alt="Photo">
+      </a>
     </div>
-    <div class="card-body table table-responsive-lg">
-      <div class="table-responsive">
-      <div class="address_information">
-        <div class="row">
-          <h2 class="mx-auto">Academic Information</h2>
-        </div>
-        <hr>
-        <div class="row">
-          <div style="font-size:24px; margin-left: 30px">
-            <pre>Class                 : {{ student.class_info |upper}}</pre>
-            <pre>Registration No       : {{ student.registration_no }}</pre>
-            <pre>Academic Year         : {{ student.session_info }}</pre>
-            <pre>Class Teacher         : {{ student.class_teacher|upper }}</pre>
-            {% comment %} <pre>Department        : {{ student.department|upper }}</pre> {% endcomment %}
+    <div class="card-body">
+      <!-- Sections with consistent styling and responsive grid -->
+      <div class="row">
+        <!-- Academic Information -->
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100">
+            <div class="card-header text-center">
+              <h2>Academic Information</h2>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <tbody>
+                    <tr><th>Class</th><td>{{ student.class_info.name|upper }}</td></tr>
+                    <tr><th>Registration No</th><td>{{ student.registration_no }}</td></tr>
+                    <tr><th>Academic Year</th><td>{{ student.session_info.name }}</td></tr>
+                    <tr><th>Class Teacher</th><td>{{ student.class_teacher.name|upper }}</td></tr>
+                    <tr><th>Department</th><td>{{ student.department_info.name|upper|default:"Not Defined" }}</td></tr>
+                    <tr><th>Roll No</th><td>{{ student.enrolledstudent.roll|default:"Not Defined"|title }}</td></tr>
+                    <tr><th>Stay Mode</th><td>{{ student.stay_mode|default:"Not Defined"|title }}</td></tr>
+                    <tr><th>Traveling Mode</th><td>{{ student.traveling_mode|default:"Not Defined"|title }}</td></tr>
+                    {% if student.traveling_mode == 'college bus' %}
+                    <tr><th>College Bus Stop</th><td>{{ student.college_bus_stop|default:"Not Defined"|title }}</td></tr>
+                    {% else %}
+                    <tr><th>Private Traveling From</th><td>{{ student.college_bus_stop|default:"Not Defined"|title }}</td></tr>
+                    {% endif %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="personal_information">
-        <div class="row">
-          <h2 class="mx-auto">Personal Information</h2>
-        </div>
-        <hr>
-        <div class="row">
-          <div style="font-size:24px; margin-left: 30px">
-            <pre>Name                               : {{ student.personal_info.name|upper }}</pre>
-            <pre>Blood Group                        : {{ student.personal_info.blood_group }}</pre>
-            <pre>Date of Birth                      : {{ student.personal_info.date_of_birth }}</pre>
-            <pre>Gender                             : {{ student.personal_info.gender }}</pre>
-            <pre>Phone No                           : {{ student.personal_info.phone_no }}</pre>
-            <pre>Email                              : {{ student.personal_info.email }}</pre>
-            <pre>Birth Certificate No               : {{ student.personal_info.birth_certificate_no }}</pre>
-            <pre>Religion                           : {{ student.personal_info.religion }}</pre>
-            <pre>Nationality                        : {{ student.personal_info.nationality }}</pre>
+        <!-- Personal Information -->
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100">
+            <div class="card-header text-center">
+              <h2>Personal Information</h2>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <tbody>
+                    <tr><th>Name</th><td>{{ student.personal_info.name|upper }}</td></tr>
+                    <tr><th>Blood Group</th><td>{{ student.personal_info.blood_group }}</td></tr>
+                    <tr><th>Date of Birth</th><td>{{ student.personal_info.date_of_birth }}</td></tr>
+                    <tr><th>Gender</th><td>{{ student.personal_info.gender }}</td></tr>
+                    <tr><th>Phone No</th><td>{{ student.personal_info.phone_no }}</td></tr>
+                    <tr><th>Email</th><td>{{ student.personal_info.email }}</td></tr>
+                    <tr><th>Birth Certificate No</th><td>{{ student.personal_info.birth_certificate_no }}</td></tr>
+                    <tr><th>Religion</th><td>{{ student.personal_info.religion }}</td></tr>
+                    <tr><th>Nationality</th><td>{{ student.personal_info.nationality }}</td></tr>
+                    <tr><th>Mother Tongue</th><td>{{ student.personal_info.mother_tongue.name|default:"Marathi" }}</td></tr>
+                    <tr><th>Candidature Type</th><td>{{ student.personal_info.candidature_type.name|default:"Maharashtra Type-A" }}</td></tr>
+                    <tr><th>Category</th><td>{{ student.personal_info.category.name|default:"Not Available" }}</td></tr>
+                    <tr><th>PH Type</th><td>{{ student.personal_info.ph_type.name|default:"None" }}</td></tr>
+                    <tr><th>Linguistic Minority</th><td>{{ student.personal_info.linguistic_minority.name|default:"Not Available" }}</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="address_information">
-        <div class="row">
-          <h2 class="mx-auto">Address Information</h2>
-        </div>
-        <hr>
-        <div class="row">
-          <div style="font-size:24px; margin-left: 30px">
-            <pre>District                            : {{ student.address_info.district }}</pre>
-            <pre>Upazilla                            : {{ student.address_info.upazilla }}</pre>
-            <pre>Village                             : {{ student.address_info.union }}</pre>
-            <pre>Address in detail                   : {{ student.address_info.village }}</pre>
+        <!-- Guardian Information -->
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100">
+            <div class="card-header text-center">
+              <h2>Guardian Information</h2>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <tbody>
+                    <tr><th>Father's Name</th><td>{{ student.guardian_info.father_name|upper }}</td></tr>
+                    <tr><th>Father's Phone No</th><td>{{ student.guardian_info.father_phone_no }}</td></tr>
+                    <tr><th>Father's Occupation</th><td>{{ student.guardian_info.father_occupation }}</td></tr>
+                    <tr><th>Father's Yearly Income</th><td>{{ student.guardian_info.father_yearly_income }}</td></tr>
+                    <tr><th>Mother's Name</th><td>{{ student.guardian_info.mother_name|upper }}</td></tr>
+                    <tr><th>Mother's Phone No</th><td>{{ student.guardian_info.mother_phone_no }}</td></tr>
+                    <tr><th>Mother's Occupation</th><td>{{ student.guardian_info.mother_occupation }}</td></tr>
+                    <tr><th>Guardian Name</th><td>{{ student.guardian_info.guardian_name|upper }}</td></tr>
+                    <tr><th>Guardian Phone No</th><td>{{ student.guardian_info.guardian_phone_no }}</td></tr>
+                    <tr><th>Guardian Email</th><td>{{ student.guardian_info.guardian_email }}</td></tr>
+                    <tr><th>Relationship with Student</th><td>{{ student.guardian_info.relationship_with_student }}</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="address_information">
-        <div class="row">
-          <h2 class="mx-auto">Guardian Information</h2>
-        </div>
-        <hr>
-        <div class="row">
-          <div style="font-size:24px; margin-left: 30px">
-            <pre>Father's Name                         : {{ student.guardian_info.father_name|upper }}</pre>
-            <pre>Father's Phone No                     : {{ student.guardian_info.father_phone_no }}</pre>
-            <pre>Father's Occupation                   : {{ student.guardian_info.father_occupation }}</pre>
-            <pre>Father's Yearly Income                : {{ student.guardian_info.father_yearly_income }}</pre>
-            <pre>Mother's Name                         : {{ student.guardian_info.mother_name |upper}}</pre>
-            <pre>Mother's Phone No                     : {{ student.guardian_info.mother_phone_no }}</pre>
-            <pre>Mother's Occupation                   : {{ student.guardian_info.mother_occupation }}</pre>
-            <pre>Guardian Name                         : {{ student.guardian_info.guardian_name |upper}}</pre>
-            <pre>Guardian Phone No                     : {{ student.guardian_info.guardian_phone_no }}</pre>
-            <pre>Guardian Email                        : {{ student.guardian_info.guardian_email }}</pre>
-            <pre>Relationship with Student             : {{ student.guardian_info.relationship_with_student }}</pre>
+        <!-- Address Information -->
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100">
+            <div class="card-header text-center">
+              <h2>Address Information</h2>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <tbody>
+                    <tr><th>District</th><td>{{ student.address_info.district }}</td></tr>
+                    <tr><th>Upazilla</th><td>{{ student.address_info.upazilla }}</td></tr>
+                    <tr><th>Village</th><td>{{ student.address_info.union }}</td></tr>
+                    <tr><th>Address in Detail</th><td>{{ student.address_info.village }}</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="emergency_contact_information">
-        <div class="row">
-          <h2 class="mx-auto">Emergency Contact Information</h2>
-        </div>
-        <hr>
-        <div class="row">
-          <div style="font-size:24px; margin-left: 30px">
-            <pre>Name                                   : {{ student.emergency_contact_info.name }}</pre>
-            <pre>Address                                : {{ student.emergency_contact_info.address }}</pre>
-            <pre>Relationship with Student              : {{ student.emergency_contact_info.relationship_with_student }}</pre>
-            <pre>Phone No                               : {{ student.emergency_contact_info.phone_no }}</pre>
-            <pre>Email                                  : {{ student.emergency_contact_info.email }}</pre>
+        <!-- Emergency Contact Information -->
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100">
+            <div class="card-header text-center">
+              <h2>Emergency Contact</h2>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <tbody>
+                    <tr><th>Name</th><td>{{ student.emergency_contact_info}}</td></tr>
+                    <tr><th>Address</th><td>{{ student.emergency_contact_info.address }}</td></tr>
+                    <tr><th>Relationship</th><td>{{ student.emergency_contact_info.relationship_with_student }}</td></tr>
+                    <tr><th>Phone No</th><td>{{ student.emergency_contact_info.phone_no }}</td></tr>
+                    <tr><th>Email</th><td>{{ student.emergency_contact_info.email }}</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="emergency_contact_information">
-        <div class="row">
-          <h2 class="mx-auto">Previous Academic Information</h2>
-        </div>
-        <hr>
-        <div class="row">
-          <div style="font-size:24px; margin-left: 30px">
-            <pre>Institute Name                          : {{ student.previous_academic_info.institute_name }}</pre>
-            <pre>Name of Exam                            : {{ student.previous_academic_info.name_of_exam }}</pre>
-            <pre>Group                                   : {{ student.previous_academic_info.group }}</pre>
-            <pre>Grade/Gpa                               : {{ student.previous_academic_info.gpa }}</pre>
-            <pre>Board Roll                              : {{ student.previous_academic_info.board_roll }}</pre>
-            <pre>Passing Year                            : {{ student.previous_academic_info.passing_year }}</pre>
+        <!-- Previous Academic Information -->
+        <div class="col-md-6 col-lg-4 mb-4">
+          <div class="card h-100">
+            <div class="card-header text-center">
+              <h2>Previous Academic Info</h2>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                  <tbody>
+                    <tr><th>Institute Name</th><td>{{ student.previous_academic_info.institute_name|default:"Not Updated" }}</td></tr>
+                    <tr><th>Name of Exam</th><td>{{ student.previous_academic_info.name_of_exam|default:"Not Updated" }}</td></tr>
+                    <tr><th>Group</th><td>{{ student.previous_academic_info.group|default:"Not Updated" }}</td></tr>
+                    <tr><th>Grade/GPA</th><td>{{ student.previous_academic_info.gpa|default:"Not Updated" }}</td></tr>
+                    <tr><th>Board Roll</th><td>{{ student.previous_academic_info.board_roll|default:"Not Updated" }}</td></tr>
+                    <tr><th>Passing Year</th><td>{{ student.previous_academic_info.passing_year|default:"Not Updated" }}</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div class="previous_academic_information">
-        <div class="row">
-          <h2 class="mx-auto">Necessary Documents</h2>
-        </div>
-        <hr>
-        <div class="row">
-          <div style="font-size:24px; margin-left: 30px">
-            <pre>Birth Certificate                        : {{ student.previous_academic_certificate.birth_certificate }}</pre>
-            <pre>XYZ                                      : {{ student.previous_academic_certificate.release_letter }}</pre>
-            <pre>Testimonial                              : {{ student.previous_academic_certificate.testimonial }}</pre>
-            <pre>Marksheet                                : {{ student.previous_academic_certificate.marksheet }}</pre>
-            <pre>XYZ                                      : {{ student.previous_academic_certificate.stipen_certificate }}</pre>
-            <pre>Other Certificate                        : {{ student.previous_academic_certificate.other_certificate }}</pre>
+        <!-- Necessary Documents -->
+        <div class="col-md-6 col-lg-12 mb-4">
+          <div class="card">
+            <div class="card-header text-center">
+              <h2>Necessary Documents</h2>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive-lg">
+                <table class="table table-bordered table-hover">
+                  <tbody>
+                    <tr><th>Birth Certificate</th><td>{{ student.previous_academic_certificate.birth_certificate }}</td></tr>
+                    <tr><th>Release Letter</th><td>{{ student.previous_academic_certificate.release_letter }}</td></tr>
+                    <tr><th>Testimonial</th><td>{{ student.previous_academic_certificate.testimonial }}</td></tr>
+                    <tr><th>Marksheet</th><td>{{ student.previous_academic_certificate.marksheet }}</td></tr>
+                    <tr><th>Stipend Certificate</th><td>{{ student.previous_academic_certificate.stipen_certificate }}</td></tr>
+                    <tr><th>Other Certificate</th><td>{{ student.previous_academic_certificate.other_certificate }}</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </div>
   </div>
+</div>
+
+<!-- Optional CSS to add some animation and consistent sizing -->
+<style>
+  .profile-image {
+    height: 200px;
+    width: 200px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+  
+  .profile-image:hover {
+    transform: scale(1.05);
+  }
+  
+  .card {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover {
+    box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+    transform: translateY(-5px);
+  }
+  
+  @media (max-width: 768px) {
+    .profile-image {
+      height: 150px;
+      width: 150px;
+    }
+  }
+</style>
+
 {% endblock %}

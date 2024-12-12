@@ -1,83 +1,339 @@
 <!DOCTYPE html>
-<!--
-* CoreUI - Free Bootstrap Admin Template
-* @version v2.1.12
-* @link https://coreui.io
-* Copyright (c) 2018 creativeLabs Łukasz Holeczek
-* Licensed under MIT (https://coreui.io/license)
--->
-
 <html lang="en">
-  <head>
-    <link href="node_modules/@coreui/icons/css/coreui-icons.min.css" rel="stylesheet">
-    <link href="node_modules/flag-icon-css/css/flag-icon.min.css" rel="stylesheet">
-    <link href="node_modules/font-awesome/css/font-awesome.min.css" rel="stylesheet">
-    <link href="node_modules/simple-line-icons/css/simple-line-icons.css" rel="stylesheet">
-    <!-- Main styles for this application-->
-    <link href="css/style.css" rel="stylesheet">
-    <link href="vendors/pace-progress/css/pace.min.css" rel="stylesheet">
-    <!-- Global site tag (gtag.js) - Google Analytics-->
-    <script async="" src="https://www.googletagmanager.com/gtag/js?id=UA-118965717-3"></script>
-    <script>
-      window.dataLayer = window.dataLayer || [];
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Karmayogi Institute of Technology - Login</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f4f6f9;
+        }
 
-      function gtag() {
-        dataLayer.push(arguments);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        }
+
+        .login-container {
+            display: flex;
+            width: 900px;
+            max-width: 95%;
+            background-color: white;
+            box-shadow: 0 15px 50px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .login-form {
+            flex: 1;
+            padding: 40px;
+            background-color: white;
+        }
+
+        .login-info {
+            flex: 0.6;
+            background-color: var(--primary-color);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-form h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+            animation: slideFromLeft 0.8s ease-out;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 20px;
+            animation: slideFromRight 0.8s ease-out;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px 12px 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        .input-group-prepend {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+        }
+
+        .input-group-append {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            animation: slideFromBottom 0.8s ease-out;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .toggle-password {
+            cursor: pointer;
+            color: var(--secondary-color);
+        }
+
+        .login-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background-color: rgba(255,255,255,0.1);
+            transform: rotate(-45deg);
+            animation: wave 5s linear infinite;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideFromLeft {
+            from { opacity: 0; transform: translateX(-50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideFromRight {
+            from { opacity: 0; transform: translateX(50px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes slideFromBottom {
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes wave {
+            0% { transform: rotate(-45deg) translate(0, 0); }
+            50% { transform: rotate(-45deg) translate(10px, 10px); }
+            100% { transform: rotate(-45deg) translate(0, 0); }
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                flex-direction: column;
+            }
+
+            .login-info {
+                display: none;
+            }
+        }
+
+        .forgot-password {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        .forgot-password a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+
+        .message-container {
+          position: fixed;
+          top: 20px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1000;
+          width: 300px;
       }
-      gtag('js', new Date());
-      // Shared ID
-      gtag('config', 'UA-118965717-3');
-      // Bootstrap ID
-      gtag('config', 'UA-118965717-5');
-    </script>
-    {% include 'base/header.html' %}
-  </head>
-  <body class="app flex-row align-items-center">
-    <div class="container">
-      <div class="row justify-content-center">
-        <div class="col-md-8">
-          <div class="card-group">
-            <div class="card p-4">
-              <div class="card-body">
-                <h1>Login</h1>
-                <p class="text-muted">Sign In to your account</p>
-                <form class="" action="" method="post">
-                  {% csrf_token %}
-                  {% for fields in forms %}
-                    <div class="input-group mb-3">
-                        <div class="input-group-prepend">
-                            <span class="input-group-text">
-                                <i class="icon-user"></i>
-                            </span>
-                        </div>
-                        {{ fields }}
-                    </div>
-                  {% endfor %}
-                  <div class="row">
-                    <div class="col-6">
-                       <input type="submit" value="Login" class="btn btn-primary px-4" />
-                    </div>
-                    <div class="col-6 text-right">
-                      <button class="btn btn-link px-0" type="button">Forgot password?</button>
-                    </div>
-                  </div>
-                </form>
-              </div>
+
+      .alert {
+          padding: 15px;
+          border-radius: 5px;
+          margin-bottom: 15px;
+          opacity: 0;
+          transform: translateY(-20px);
+          transition: all 0.5s ease;
+          display: flex;
+          align-items: center;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+
+      .alert.show {
+          opacity: 1;
+          transform: translateY(0);
+      }
+
+      .alert-success {
+          background-color: var(--success-color);
+          color: white;
+      }
+
+      .alert-error {
+          background-color: var(--error-color);
+          color: white;
+      }
+
+      .alert-icon {
+          margin-right: 10px;
+          font-size: 1.2em;
+      }
+
+      .alert-close {
+          margin-left: auto;
+          cursor: pointer;
+          opacity: 0.7;
+          transition: opacity 0.3s ease;
+      }
+
+      .alert-close:hover {
+          opacity: 1;
+      }
+    </style>
+</head>
+<body>
+
+  <div class="message-container" id="messageContainer">
+    <center> {% if messages %}
+      <div class="messages "style="color: green;>
+        {% for message in messages %}
+        <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% if error_message %}
+      <div class="error-message" style="color: red;">
+          {{ error_message }}
+      </div>
+  {% endif %}</center>
+  
+</div>
+
+    
+    <div class="login-container">
+      <div class="login-form">
+        <h1>Login</h1>
+        <form action="" method="post">
+          {% csrf_token %}
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <i class="fas fa-user"></i>
             </div>
-            <div class="card text-white bg-primary py-5 d-md-down-none" style="width:44%">
-              <div class="card-body text-center">
-                <div>
-                  <h2>Contact Admin</h2>
-                  <p>Welcome to Karmayogi Institute of Technology</p>
-                  <button class="btn btn-primary active mt-3" type="button">Register Now!</button>
-                </div>
-              </div>
+            <input type="text" name="username" placeholder="Username" required />
+          </div>
+  
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <i class="fas fa-envelope"></i>
+            </div>
+            <input type="email" name="email" placeholder="Email" required />
+          </div>
+  
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <i class="fas fa-phone"></i>
+            </div>
+            <input type="tel" name="contact" placeholder="Contact Number" required />
+          </div>
+  
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <i class="fas fa-lock"></i>
+            </div>
+            <input type="password" name="password" placeholder="Password" required id="password" />
+            <div class="input-group-append">
+              <span class="toggle-password" onclick="togglePassword()">
+                <i class="fas fa-eye"></i>
+              </span>
             </div>
           </div>
-        </div>
+  
+          <button type="submit" class="btn">Login</button>
+          
+  
+          <div class="forgot-password">
+            <p class="mt-3 text-center">
+              Need help?
+              <a href="mailto:mipashya@gmail.com" class="text-primary">Email us</a>
+            </p>
+          </div>
+        </form>
+      </div>
+  
+      <div class="login-info">
+        <h2>Contact Admin</h2>
+        <p>Welcome to Karmayogi Institute of Technology</p>
+        <button
+          class="btn"
+          style="background-color: white; color: var(--primary-color); margin-top: 20px;"
+        >
+          Register Now!
+        </button>
       </div>
     </div>
-    <!-- CoreUI and necessary plugins-->
-    {% include 'base/js.html' %}
+  
+    <script>
+      function togglePassword() {
+        const passwordInput = document.getElementById("password");
+        const toggleIcon = document.querySelector(".toggle-password i");
+        if (passwordInput.type === "password") {
+          passwordInput.type = "text";
+          toggleIcon.classList.remove("fa-eye");
+          toggleIcon.classList.add("fa-eye-slash");
+        } else {
+          passwordInput.type = "password";
+          toggleIcon.classList.remove("fa-eye-slash");
+          toggleIcon.classList.add("fa-eye");
+        }
+      }
+    </script>
   </body>
+  
+
 </html>

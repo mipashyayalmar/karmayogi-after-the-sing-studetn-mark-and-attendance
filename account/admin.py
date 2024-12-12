@@ -5,8 +5,8 @@ from .models import UserProfile, Message
 
 # Custom filter for Employee Type in UserProfile
 class EmployeeTypeFilter(admin.SimpleListFilter):
-    title = 'Employee Type'  # Filter title in the admin panel
-    parameter_name = 'employee_type'  # URL parameter for filtering
+    title = 'Employee Type' 
+    parameter_name = 'employee_type'  
 
     def lookups(self, request, model_admin):
         """
@@ -35,15 +35,15 @@ class EmployeeTypeFilter(admin.SimpleListFilter):
 # Admin configuration for UserProfile
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = (
-        'colored_name',  # Custom column with background color
+        'colored_name',  
         'user', 
         'gender', 
-        'colored_employee_type',  # Employee type with colored badge
+        'colored_employee_type',  
         'student_class', 
         'student_session', 
         'department', 
         'date_of_birth', 
-        'display_photo',  # Updated to show the styled photo
+        'display_photo', 
     )
     list_filter = (EmployeeTypeFilter, 'gender', 'student_class', 'student_session', 'department')  # Custom filter
     search_fields = ('name', 'user__username')  # Search by name or username
@@ -71,8 +71,8 @@ class UserProfileAdmin(admin.ModelAdmin):
                 '<a href="{}" target="_blank">'
                 '<img src="{}" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;" />'
                 '</a>',
-                obj.photo.url,  # Full-size image URL for the link
-                obj.photo.url,  # Thumbnail image URL for the <img> tag
+                obj.photo.url, 
+                obj.photo.url,  
             )
         return "No Photo"
 
@@ -106,12 +106,14 @@ class UserProfileAdmin(admin.ModelAdmin):
         Get the background color based on the employee type.
         """
         if employee_type == 'student':
-            return '#4CAF50'  # Green for students
+            return '#4CAF50' 
+        elif employee_type == 'professor':
+            return '#aa21f3' 
         elif employee_type == 'employee':
-            return '#2196F3'  # Blue for employees
+            return '#2196F3' 
         elif employee_type == 'teacher':
-            return '#FF9800'  # Orange for teachers
-        return '#9E9E9E'  # Gray for undefined types
+            return '#FF9800' 
+        return '#9E9E9E' 
 
 
 # Admin configuration for Message

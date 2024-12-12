@@ -6,14 +6,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Access Denied</title>
+  <marquee>Hey  {%if student.personal_info.name %} {{ student.personal_info.name }} {% elif profile.user.username %} {{ profile.user.username|title }}
+    {% else%} Student{% endif %} ! Welcome to the Kit Management System interface.</marquee>
+  <title>Enrollment Required</title>
   <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      min-height: 100vh;
+    }
+
     .container {
       max-width: 800px;
       margin: 50px auto;
       padding: 40px;
       background-color: #fff;
-      box-shadow: 0 8px 20px rgba(217, 83, 79, 0.15);
+      box-shadow: 0 8px 20px rgba(52, 152, 219, 0.15);
       border-radius: 12px;
       text-align: center;
       position: relative;
@@ -32,55 +41,17 @@
     }
 
     h2 {
-      color: #d9534f;
+      color: #3498db;
       font-size: 32px;
       margin-top: 0;
       animation: fadeIn 0.8s ease-out;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-
-    p {
-      color: #555;
-      line-height: 1.8;
-      font-size: 16px;
-      margin: 20px 0;
-      animation: fadeIn 1s ease-out;
-    }
-
-    ul {
-      list-style-type: none;
-      padding: 0;
-      text-align: left;
-      margin: 30px 0;
-      animation: fadeIn 1.2s ease-out;
-    }
-
-    li {
-      margin-bottom: 15px;
-      padding: 10px;
-      border-radius: 6px;
-      transition: background-color 0.3s ease;
-    }
-
-    li:hover {
-      background-color: #f8f9fa;
-    }
-
-    strong {
-      color: #333;
-      font-weight: 600;
-      margin-right: 10px;
-    }
-
-    .red-flag {
+    .enrollment-flag {
       position: absolute;
       top: -25px;
       right: -25px;
-      background-color: #d9534f;
+      background-color: #3498db;
       color: #fff;
       width: 50px;
       height: 50px;
@@ -88,44 +59,18 @@
       border-radius: 50%;
       font-weight: bold;
       font-size: 24px;
-      box-shadow: 0 4px 10px rgba(217, 83, 79, 0.3);
-      animation: pulse 2s infinite, rotate 0.5s ease-out;
+      box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+      animation: pulse 2s infinite;
     }
 
     @keyframes pulse {
-      0% {
-        transform: scale(1);
-        box-shadow: 0 4px 10px rgba(217, 83, 79, 0.3);
-      }
-      50% {
-        transform: scale(1.1);
-        box-shadow: 0 4px 20px rgba(217, 83, 79, 0.5);
-      }
-      100% {
-        transform: scale(1);
-        box-shadow: 0 4px 10px rgba(217, 83, 79, 0.3);
-      }
-    }
-
-    @keyframes rotate {
-      from { transform: rotate(-180deg); }
-      to { transform: rotate(0); }
-    }
-
-    .shake {
-      animation: shake 0.82s cubic-bezier(.36,.07,.19,.97) both;
-    }
-
-    @keyframes shake {
-      10%, 90% { transform: translate3d(-1px, 0, 0); }
-      20%, 80% { transform: translate3d(2px, 0, 0); }
-      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-      40%, 60% { transform: translate3d(4px, 0, 0); }
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
     }
 
     .info-box {
       background-color: #f8f9fa;
-      border-left: 4px solid #d9534f;
+      border-left: 4px solid #3498db;
       padding: 20px;
       margin: 20px 0;
       text-align: left;
@@ -142,39 +87,79 @@
         opacity: 1;
       }
     }
+
+    .contact-steps {
+      background-color: #e9f2f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: left;
+    }
+
+    .contact-steps h3 {
+      color: #3498db;
+      margin-bottom: 15px;
+    }
+
+    .contact-steps ol {
+      padding-left: 20px;
+    }
+
+    .contact-steps li {
+      margin-bottom: 10px;
+      color: #2c3e50;
+    }
+
+    .action-button {
+      display: inline-block;
+      background-color: #3498db;
+      color: white;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    .action-button:hover {
+      background-color: #2980b9;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="red-flag">!</div>
-    <h2>Access Denied</h2>
+    <div class="enrollment-flag">!</div>
+    <h2>Enrollment Required</h2>
+    
     <div class="info-box">
-      <p>It seems that you are not enrolled in any class currently. Please make sure to reach out to your Head of Department (HoD) or Class Coordinator (CC) to resolve this issue.</p>
+      <p>You are currently not enrolled in any academic program or course. To gain access, you must complete the enrollment process through the appropriate channels.</p>
     </div>
-    <p>Here are your details for verification:</p>
-    <ul>
-      <li><strong>Name:</strong> {{ user_profile.name }}</li>
-      <li><strong>Employee Type:</strong> {{ user_profile.employee_type|title }}</li>
-      <li><strong>Department:</strong> {{ user_profile.department }}</li>
-    </ul>
-    <p>If you believe this is a mistake, please contact the administration for further assistance.</p>
+
+    <div class="contact-steps">
+      <h3>Next Steps for Enrollment</h3>
+      <ol>
+        <li>Contact your Head of Department (HoD) to discuss enrollment options</li>
+        <li>Consult with the Class Coordinator about available programs</li>
+        <li>Complete the necessary enrollment documentation</li>
+        <li>Submit required academic and administrative paperwork</li>
+      </ol>
+    </div>
+
+    <p>If you need immediate assistance, please reach out to the academic administration office.</p>
+
+    <a href="mailto:academic.support@institution.edu" class="action-button">Contact Enrollment Support</a>
   </div>
 
   <script>
-    // Add shake animation to container when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(() => {
-        document.querySelector('.container').classList.add('shake');
-      }, 500);
-    });
-
-    // Add hover effect to list items
-    document.querySelectorAll('li').forEach(item => {
+    // Optional: Add some interactive elements
+    document.querySelectorAll('.contact-steps li').forEach(item => {
       item.addEventListener('mouseenter', function() {
         this.style.transform = 'translateX(10px)';
+        this.style.color = '#3498db';
       });
       item.addEventListener('mouseleave', function() {
         this.style.transform = 'translateX(0)';
+        this.style.color = '#2c3e50';
       });
     });
   </script>

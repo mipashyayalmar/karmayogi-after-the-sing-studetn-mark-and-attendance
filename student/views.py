@@ -4,14 +4,23 @@ from .forms import *
 from .models import *
 from django.db.models import Q
 from .forms import StudentSearchForm
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import AcademicInfo
 import logging
 from teacher.models import PersonalInfo as TeacherPersonalInfo
 from django.urls import reverse
+from collections import defaultdict
+import json
+from attendance.models import StudentAttendance, StudentMark, EnrolledStudent
+from attendance.forms import SearchEnrolledStudentForm, MarkForm
+from result.models import SubjectRegistration
+from account.models import Message
+from django.shortcuts import get_object_or_404, render, redirect
+from django.core.mail import send_mail
+from django.conf import settings
 
+@login_required(login_url='login')
 def load_upazilla(request):
     try:
         user_profile = UserProfile.objects.get(user=request.user)
@@ -50,7 +59,7 @@ def class_wise_student_registration(request):
 
 
 
-
+@login_required(login_url='/login/') 
 def student_registration(request, teacher_id=None):
     user_profile = get_object_or_404(UserProfile, user=request.user)
     teacher = None
@@ -130,111 +139,62 @@ def student_registration(request, teacher_id=None):
     }
     return render(request, 'student/student-registration.html', context)
 
-from account.models import Message
-from django.shortcuts import get_object_or_404, render
-from django.contrib import messages
-from django.core.mail import send_mail
-from django.db.models import Q
-from django.conf import settings
 
-from django.shortcuts import redirect
-
+@login_required(login_url='login')
 def student_list(request, teacher_id=None):
     user_profile = get_object_or_404(UserProfile, user=request.user)
+
+    # Redirect unauthorized access
+    if user_profile.employee_type != 'student' and user_profile.employee_type not in ['teacher', 'professor']:
+        messages.error(request, "Access Denied.")
+        return redirect('access-denied')  # Replace 'access-denied' with the appropriate URL name.
+
     teacher = None
     if user_profile.employee_type in ['teacher', 'professor']:
-        teacher = get_object_or_404(TeacherPersonalInfo, id=teacher_id) if teacher_id else get_object_or_404(TeacherPersonalInfo, address__userprofile=user_profile)
+        teacher = get_object_or_404(TeacherPersonalInfo, id=teacher_id) if teacher_id else get_object_or_404(
+            TeacherPersonalInfo, address__userprofile=user_profile)
 
     form = StudentSearchForm(request.GET or None, initial={'user_profile': user_profile})
-    student_name = request.GET.get('name', None)
-    class_info = request.GET.get('class_info', None)
     session_info = request.GET.get('session_info', None)
+    class_info = request.GET.get('class_info', None)
+    roll_no = request.GET.get('roll_no', None)
 
-    queries = Q(is_delete=False)
+    # Build query for filtering students
+    queries = Q(is_delete=False)  # Assuming `is_delete` exists in the AcademicInfo model
     if user_profile.employee_type == 'student':
-        if not class_info and user_profile.student_class:
-            class_info = user_profile.student_class.id
+        queries &= Q(personal_info__userprofile=user_profile)
         if not session_info and user_profile.student_session:
             session_info = user_profile.student_session.id
-        if not class_info or not session_info:
+        if not session_info:
             context = {
                 'form': form,
                 'students': AcademicInfo.objects.none(),
                 'profile': user_profile,
-                'error_message': 'Your profile is missing class or session information. Please contact your HOD.'
+                'error_message': 'Your profile is missing session information. Please contact your HOD.'
             }
             return render(request, 'student/student-list.html', context)
 
-    if student_name:
-        queries &= Q(personal_info__name__icontains=student_name)
-    if class_info:
-        queries &= Q(class_info=class_info)
+    # Filter by session_info if provided
     if session_info:
         queries &= Q(session_info=session_info)
 
-    students = AcademicInfo.objects.filter(queries, personal_info__userprofile__isnull=False).order_by('-id')
+    # Filter by class_info if provided
+    if class_info:
+        queries &= Q(class_info__id=class_info)
 
+    # Filter by roll number if provided
+    if roll_no:
+        queries &= Q(enrolledstudent__roll=roll_no)  # Use the reverse relation to filter by roll
+
+    # Fetch students and order by session and roll number
+    students = AcademicInfo.objects.filter(queries).select_related(
+        'session_info', 'personal_info', 'class_info'
+    ).prefetch_related('enrolledstudent').order_by('session_info__name', 'enrolledstudent__roll')
+
+    # Restrict session and class options for students
     if user_profile.employee_type == 'student':
-        form.fields['class_info'].queryset = ClassInfo.objects.filter(id=user_profile.student_class.id)
         form.fields['session_info'].queryset = Session.objects.filter(id=user_profile.student_session.id)
-
-    if request.method == 'POST':
-        recipient_ids = request.POST.getlist('selected_students')
-        message_text = request.POST.get('message_text')
-        image = request.FILES.get('image', None)
-
-        if not recipient_ids:
-            recipient_ids = [student.personal_info.userprofile.id for student in students]
-
-        if message_text and message_text.strip():
-            try:
-                for recipient_id in recipient_ids:
-                    recipient_profile = get_object_or_404(UserProfile, id=recipient_id)
-                    recipient = recipient_profile.user
-                    sender_profile = user_profile
-                    sender = request.user
-
-                    # Save message to the database
-                    Message.objects.create(
-                        sender=sender,
-                        recipient=recipient,
-                        message_text=message_text,
-                        image=image
-                    )
-
-                    # Send email notification
-                    subject = "Karmayogi Institute of Technology"
-                    domain = request.META['HTTP_HOST']
-                    link = f"http://{domain}/messages/"
-                    email_message = f"""
-                        Hello {recipient_profile.name},
-
-                        You have received a new message from {sender_profile.name}:
-
-                        "{message_text}"
-
-                        Click the link below to view your messages:
-                        {link}
-
-                        Best regards,
-                        {settings.DEFAULT_FROM_EMAIL}
-                    """
-                    send_mail(
-                        subject,
-                        email_message,
-                        settings.DEFAULT_FROM_EMAIL,
-                        [recipient.email],
-                        fail_silently=False,
-                    )
-
-                messages.success(request, f"Message sent successfully to {len(recipient_ids)} student(s).")
-            except Exception as e:
-                messages.error(request, f"Failed to send message: {e}")
-        else:
-            messages.error(request, "Please enter a message.")
-
-        # Redirect after processing the POST request
-        return redirect('student-list')  # Replace 'student-list' with the correct URL name of your view
+        form.fields['class_info'].queryset = ClassInfo.objects.filter(id=user_profile.student_class.id)
 
     context = {
         'teacher': teacher,
@@ -247,18 +207,10 @@ def student_list(request, teacher_id=None):
 
 
 
-from django.shortcuts import render, get_object_or_404
-from django.contrib.auth.decorators import login_required
-from collections import defaultdict
-import json
-from attendance.models import StudentAttendance, StudentMark, EnrolledStudent
-from attendance.forms import SearchEnrolledStudentForm, MarkForm
-from result.models import SubjectRegistration
-
-
 @login_required(login_url='login')
 def student_attendance(request, student_id):
     student = get_object_or_404(EnrolledStudent, id=student_id)
+
 
     # Attendance records and counts
     attendance_records = StudentAttendance.objects.filter(student=student)
@@ -329,7 +281,7 @@ def student_marks(request, student_id):
     }
 
     return render(request, 'student/student-marks.html', context)
-
+@login_required(login_url='login')
 def student_profile(request, reg_no, teacher_id=None):
     user_profile = get_object_or_404(UserProfile, user=request.user)
     
@@ -340,13 +292,20 @@ def student_profile(request, reg_no, teacher_id=None):
 
     student = get_object_or_404(AcademicInfo, registration_no=reg_no)
     
+    # Fetch the enrolled student instance
+    try:
+        enrolled_student = EnrolledStudent.objects.get(student=student)
+    except EnrolledStudent.DoesNotExist:
+        enrolled_student = None
+
     context = {
         'teacher': teacher,
         'profile': user_profile,
-        'student': student
+        'student': student,
+        'enrolled_student': enrolled_student,  # Pass enrolled student to template
     }
     return render(request, 'student/student-profile.html', context)
-
+@login_required(login_url='login')
 def student_edit(request, reg_no, teacher_id=None):
     # Get the user's profile
     user_profile = get_object_or_404(UserProfile, user=request.user)
@@ -470,6 +429,7 @@ def student_undo_delete(request, reg_no):
     return redirect('student-list')
 
 
+@login_required(login_url='login')
 def student_search(request,teacher_id=None):
     user_profile = get_object_or_404(UserProfile, user=request.user)
     
@@ -517,6 +477,8 @@ def student_search(request,teacher_id=None):
         'student': student
     }
     return render(request, 'student/student-search.html', context)
+
+@login_required(login_url='/login/') 
 def enrolled_student(request):
     try:
         user_profile = UserProfile.objects.get(user=request.user)
@@ -542,32 +504,83 @@ def enrolled_student(request):
         'student': student_query
     }
     return render(request, 'student/enrolled.html', context)
+
+
+@login_required(login_url='login')  
+def enrolled_student(request):
+    try:
+        # Ensure the user has a profile or create one
+        user_profile, created = UserProfile.objects.get_or_create(
+            user=request.user,
+            defaults={'employee_type': ['professor', 'teacher']}  # Default employee type
+        )
+    except Exception as e:
+        return HttpResponseForbidden(f"Error accessing user profile: {e}")
+
+    # Populate the form with GET data
+    forms = EnrolledStudentForm(request.GET)
+    cls = request.GET.get('class_name', None)
+    status = request.GET.get('status', None)
+
+    # Build the queryset
+    student_query = AcademicInfo.objects.all()
+
+    if cls:
+        student_query = student_query.filter(class_info=cls)
+
+    if status:
+        student_query = student_query.filter(status=status)
+
+    context = {
+        'profile': user_profile,
+        'forms': forms,
+        'student': student_query
+    }
+    return render(request, 'student/enrolled.html', context)
+
+
+@login_required(login_url='login') 
 def student_enrolled(request, reg):
     try:
-        user_profile = UserProfile.objects.get(user=request.user)
-    except UserProfile.DoesNotExist:
-        user_profile = UserProfile.objects.create(user=request.user, employee_type=['professor','teacher'])
-        
-    student = AcademicInfo.objects.get(registration_no=reg)
+        # Ensure the user has a profile or create one
+        user_profile, created = UserProfile.objects.get_or_create(
+            user=request.user,
+            defaults={'employee_type': ['professor', 'teacher']}  # Default employee type
+        )
+    except Exception as e:
+        return HttpResponseForbidden(f"Error accessing user profile: {e}")
+
+    # Get the student by registration number
+    student = get_object_or_404(AcademicInfo, registration_no=reg)
     forms = StudentEnrollForm()
+
     if request.method == 'POST':
         forms = StudentEnrollForm(request.POST)
         if forms.is_valid():
             roll = forms.cleaned_data['roll_no']
             class_name = forms.cleaned_data['class_name']
-            EnrolledStudent.objects.create(class_name=class_name, student=student, roll=roll)
+
+            # Enroll the student
+            EnrolledStudent.objects.create(
+                class_name=class_name,
+                student=student,
+                roll=roll
+            )
+
+            # Update student status
             student.status = 'enrolled'
             student.save()
-            return redirect('enrolled-student-list')
+
+            return redirect('enrolled-student-list')  # Redirect to the student list view
+
     context = {
-        'profile' : user_profile,
+        'profile': user_profile,
         'student': student,
         'forms': forms
     }
     return render(request, 'student/student-enrolled.html', context)
 
-
-
+@login_required(login_url='/login/') 
 def enrolled_student_list(request):
     try:
         user_profile = UserProfile.objects.get(user=request.user)

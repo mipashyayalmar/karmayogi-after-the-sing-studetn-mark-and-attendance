@@ -74,7 +74,7 @@ class PreviousAcademicInfoAdmin(admin.ModelAdmin):
 
 class AcademicInfoAdmin(admin.ModelAdmin):
     list_display = [
-        'get_userprofile', 'registration_no', 'class_info', 'session_info', 
+        'get_userprofile', 'registration_no', 'department_info','class_info', 'session_info', 
         'status', 'date', 'is_delete'
     ]
     search_fields = ['registration_no', 'userprofile__user__username']

@@ -4,7 +4,7 @@
 {% block title %} KIT Management System {% endblock %}
 
 {% block content %}
-<marquee>Welcome {{ profile.user.username|title }}</marquee>
+<marquee>Hey  {%if student.personal_info.name %} {{ student.personal_info.name }} {% else %} {{ profile.user.username|title }}{% endif %} ! Welcome to the Kit Management System interface.</marquee>
 
 <style>
     .bg-class { background-color: darkblue; }
