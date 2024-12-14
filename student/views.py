@@ -20,6 +20,11 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.core.mail import send_mail
 from django.conf import settings
 
+from django.http import HttpResponseForbidden
+from django.db import IntegrityError
+
+
+
 @login_required(login_url='login')
 def load_upazilla(request):
     try:
@@ -139,7 +144,6 @@ def student_registration(request, teacher_id=None):
     }
     return render(request, 'student/student-registration.html', context)
 
-
 @login_required(login_url='login')
 def student_list(request, teacher_id=None):
     user_profile = get_object_or_404(UserProfile, user=request.user)
@@ -157,7 +161,9 @@ def student_list(request, teacher_id=None):
     form = StudentSearchForm(request.GET or None, initial={'user_profile': user_profile})
     session_info = request.GET.get('session_info', None)
     class_info = request.GET.get('class_info', None)
+    department_info = request.GET.get('department_info', None)  # New filter
     roll_no = request.GET.get('roll_no', None)
+    name = request.GET.get('name', None)  # New filter for name
 
     # Build query for filtering students
     queries = Q(is_delete=False)  # Assuming `is_delete` exists in the AcademicInfo model
@@ -182,13 +188,21 @@ def student_list(request, teacher_id=None):
     if class_info:
         queries &= Q(class_info__id=class_info)
 
+    # Filter by department_info if provided
+    if department_info:
+        queries &= Q(department_info__id=department_info)  # Assuming `department_info` is a ForeignKey
+
     # Filter by roll number if provided
     if roll_no:
         queries &= Q(enrolledstudent__roll=roll_no)  # Use the reverse relation to filter by roll
 
+    # Filter by name if provided
+    if name:
+        queries &= Q(personal_info__name__icontains=name)  # Assuming `name` exists in the PersonalInfo model
+
     # Fetch students and order by session and roll number
     students = AcademicInfo.objects.filter(queries).select_related(
-        'session_info', 'personal_info', 'class_info'
+        'session_info', 'personal_info', 'class_info', 'department_info'
     ).prefetch_related('enrolledstudent').order_by('session_info__name', 'enrolledstudent__roll')
 
     # Restrict session and class options for students
@@ -203,8 +217,6 @@ def student_list(request, teacher_id=None):
         'profile': user_profile,
     }
     return render(request, 'student/student-list.html', context)
-
-
 
 
 @login_required(login_url='login')
@@ -478,32 +490,35 @@ def student_search(request,teacher_id=None):
     }
     return render(request, 'student/student-search.html', context)
 
-@login_required(login_url='/login/') 
-def enrolled_student(request):
-    try:
-        user_profile = UserProfile.objects.get(user=request.user)
-    except UserProfile.DoesNotExist:
-        user_profile = UserProfile.objects.create(user=request.user, employee_type=['professor', 'teacher'])
+# @login_required(login_url='/login/') 
+# def enrolled_student(request):
+#     try:
+#         user_profile = UserProfile.objects.get(user=request.user)
+#     except UserProfile.DoesNotExist:
+#         user_profile = UserProfile.objects.create(user=request.user, employee_type=['professor', 'teacher'])
 
-    forms = EnrolledStudentForm(request.GET)  # Populate form with GET data
-    cls = request.GET.get('class_name', None)
-    status = request.GET.get('status', None)
+#     forms = EnrolledStudentForm(request.GET)  # Populate form with GET data
+#     cls = request.GET.get('class_name', None)
+#     status = request.GET.get('status', None)
 
-    # Build the queryset
-    student_query = AcademicInfo.objects.all()
+#     # Build the queryset
+#     student_query = AcademicInfo.objects.all()
 
-    if cls:
-        student_query = student_query.filter(class_info=cls)
+#     if cls:
+#         student_query = student_query.filter(class_info=cls)
 
-    if status and status != '':
-        student_query = student_query.filter(status=status)
+#     if status and status != '':
+#         student_query = student_query.filter(status=status)
 
-    context = {
-        'profile': user_profile,
-        'forms': forms,
-        'student': student_query
-    }
-    return render(request, 'student/enrolled.html', context)
+#     context = {
+#         'profile': user_profile,
+#         'forms': forms,
+#         'student': student_query
+#     }
+#     return render(request, 'student/enrolled.html', context)
+
+
+from django.db import IntegrityError
 
 
 @login_required(login_url='login')  
@@ -517,10 +532,14 @@ def enrolled_student(request):
     except Exception as e:
         return HttpResponseForbidden(f"Error accessing user profile: {e}")
 
-    # Populate the form with GET data
-    forms = EnrolledStudentForm(request.GET)
+    # Populate the form with GET data or default to 'not enroll'
+    status = request.GET.get('status', 'not enroll')  # Default to 'not enroll'
     cls = request.GET.get('class_name', None)
-    status = request.GET.get('status', None)
+
+    forms = EnrolledStudentForm(initial={
+        'status': status,  # Ensure form displays the current filter
+        'class_name': cls,
+    })
 
     # Build the queryset
     student_query = AcademicInfo.objects.all()
@@ -528,7 +547,7 @@ def enrolled_student(request):
     if cls:
         student_query = student_query.filter(class_info=cls)
 
-    if status:
+    if status and status != 'any status':  # Apply status filter only if it's not 'any status'
         student_query = student_query.filter(status=status)
 
     context = {
@@ -536,10 +555,10 @@ def enrolled_student(request):
         'forms': forms,
         'student': student_query
     }
-    return render(request, 'student/enrolled.html', context)
+    return render(request, 'student/enrolled.html', context)    
 
 
-@login_required(login_url='login') 
+@login_required(login_url='login')
 def student_enrolled(request, reg):
     try:
         # Ensure the user has a profile or create one
@@ -560,18 +579,29 @@ def student_enrolled(request, reg):
             roll = forms.cleaned_data['roll_no']
             class_name = forms.cleaned_data['class_name']
 
-            # Enroll the student
-            EnrolledStudent.objects.create(
-                class_name=class_name,
-                student=student,
-                roll=roll
-            )
+            try:
+                # Enroll the student
+                EnrolledStudent.objects.create(
+                    class_name=class_name,
+                    student=student,
+                    roll=roll
+                )
 
-            # Update student status
-            student.status = 'enrolled'
-            student.save()
+                # Update student status
+                student.status = 'enrolled'
+                student.save()
 
-            return redirect('enrolled-student-list')  # Redirect to the student list view
+                # Add success message with name and roll number
+                messages.success(
+                    request, 
+                    f"Student with Roll No: {roll} has been successfully enrolled!"
+                )
+                return redirect('enrolled-student-list')  # Redirect to the student list view
+            except IntegrityError:
+                # Add error to the form for display
+                forms.add_error(None, "A student with this roll number is already enrolled in this class and session.")
+            except Exception as e:
+                messages.error(request, f"An unexpected error occurred: {e}")
 
     context = {
         'profile': user_profile,
@@ -579,7 +609,6 @@ def student_enrolled(request, reg):
         'forms': forms
     }
     return render(request, 'student/student-enrolled.html', context)
-
 @login_required(login_url='/login/') 
 def enrolled_student_list(request):
     try:

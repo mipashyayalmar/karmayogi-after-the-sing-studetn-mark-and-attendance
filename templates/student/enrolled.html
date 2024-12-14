@@ -6,13 +6,21 @@
 <div class="row">
     <div class="col-sm-12 col-md-6">
         <div id="DataTables_Table_0_filter" class="dataTables_filter">
-            <form action="" method="GET">
+            <form action="" method="GET" id="filter-form">
                 {{ forms }}
-                <input type="submit" value="Go">
+                <!-- Automatically submit the form on change -->
+                <script>
+                    document.querySelectorAll('select').forEach(function(select) {
+                        select.addEventListener('change', function() {
+                            document.getElementById('filter-form').submit();
+                        });
+                    });
+                </script>
             </form>
         </div>
     </div>
 </div>
+<br>
 {% if student %}
 <div class="animated fadeIn">
     <div class="card">

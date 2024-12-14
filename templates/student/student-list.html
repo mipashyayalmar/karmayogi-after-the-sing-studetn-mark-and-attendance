@@ -43,20 +43,16 @@
                             </div>
                             <div class="col-sm-12 col-md-6">
                                 <div id="DataTables_Table_0_filter" class="dataTables_filter">
-                                    <form action="" method="GET" class="d-flex flex-column align-items-center">
-                                        <div class="form-control form-control-sm border-0 w-100">
-                                            {{ form.name.label_tag }} {{ form.name }}
+                                    <div class="row">
+                                        <div class="col-sm-12 col-md-6">
+                                            <div id="DataTables_Table_0_filter" class="dataTables_filter">
+                                                <form action="" method="GET">
+                                                    {{ form.as_p }}
+                                                    <input type="submit" value="Search" class="btn btn-primary">
+                                                </form>
+                                            </div>
                                         </div>
-                                        <div class="form-control form-control-sm border-0 w-100">
-                                            {{ form.class_info.label_tag }} {{ form.class_info }}
-                                        </div>
-                                        <div class="form-control form-control-sm border-0 w-100">
-                                            {{ form.session_info.label_tag }} {{ form.session_info }}
-                                        </div>
-                                        <button type="submit" class="btn btn-primary mb-2 mt-2">
-                                            <i class="fa fa-search" aria-hidden="true"></i> Search
-                                        </button>
-                                    </form>
+                                    </div>
                                     {% if students %}
                                     <div class="text-right">
                                         <button 

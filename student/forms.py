@@ -5,10 +5,6 @@ from .models import ClassInfo
 from django import forms
 from .models import AcademicInfo
 
-
-from django import forms
-from .models import AcademicInfo
-
 class AcademicInfoForm(forms.ModelForm):
     class Meta:
         model = AcademicInfo
@@ -24,9 +20,9 @@ class AcademicInfoForm(forms.ModelForm):
             'class_teacher': forms.Select(attrs={'class': 'form-control'}),
             'administration': forms.Select(attrs={'class': 'form-control'}),
             'userprofile': forms.Select(attrs={'class': 'form-control'}),
-            'registration_no': forms.NumberInput(attrs={'class': 'form-control'}),  # Added widget
-            'stay_mode': forms.Select(attrs={'class': 'form-control'}),  # Widget for stay_mode
-            'traveling_mode': forms.Select(attrs={'class': 'form-control'}),  # Widget for traveling_mode
+            'registration_no': forms.NumberInput(attrs={'class': 'form-control'}),
+            'stay_mode': forms.Select(attrs={'class': 'form-control'}),
+            'traveling_mode': forms.Select(attrs={'class': 'form-control'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -34,10 +30,10 @@ class AcademicInfoForm(forms.ModelForm):
         self.fields['class_info'].label = 'Select Class'
         self.fields['session_info'].label = 'Academic Year'
         self.fields['registration_no'].label = 'Registration Number (optional)'
-        
-        # Labels for new fields
-        self.fields['stay_mode'].label = 'Stay Mode'  # Label for stay_mode
-        self.fields['traveling_mode'].label = 'Traveling Mode'  # Label for traveling_mode
+        self.fields['stay_mode'].label = 'Stay Mode'
+        self.fields['traveling_mode'].label = 'Traveling Mode'
+        self.fields['department_info'].queryset = Department.objects.all()
+
 
 
 
@@ -218,6 +214,11 @@ class StudentSearchForm(forms.Form):
         queryset=ClassInfo.objects.all(),
         widget=forms.Select(attrs={'class': 'form-control', 'aria-controls': 'DataTables_Table_0'})
     )
+    department_info = forms.ModelChoiceField(  # New field for department
+        required=False,
+        queryset=Department.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control', 'aria-controls': 'DataTables_Table_0'})
+    )
     registration_no = forms.IntegerField(
         required=False,
         widget=forms.NumberInput(attrs={'placeholder': 'Registration No', 'aria-controls': 'DataTables_Table_0'})
@@ -228,72 +229,43 @@ class StudentSearchForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        # Remove 'user_profile' from kwargs before passing them to the super class
         user_profile = kwargs.pop('user_profile', None)
         
         super().__init__(*args, **kwargs)
 
-        # Set the initial values for 'class_info' and 'session_info' if user_profile is provided
         if user_profile:
             self.fields['class_info'].initial = user_profile.student_class
             self.fields['session_info'].initial = user_profile.student_session
-
-
-class StudentSearchForm(forms.Form):
-    session_info = forms.ModelChoiceField(
-        required=False,
-        queryset=Session.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control', 'aria-controls': 'DataTables_Table_0'})
-    )
-    class_info = forms.ModelChoiceField(
-        required=False,
-        queryset=ClassInfo.objects.all(),
-        widget=forms.Select(attrs={'class': 'form-control', 'aria-controls': 'DataTables_Table_0'})
-    )
-    registration_no = forms.IntegerField(
-        required=False,
-        widget=forms.NumberInput(attrs={'placeholder': 'Registration No', 'aria-controls': 'DataTables_Table_0'})
-    )
-    name = forms.CharField(
-        required=False,
-        widget=forms.TextInput(attrs={'placeholder': 'Search by Name', 'class': 'form-control'})
-    )
-
-    def __init__(self, *args, **kwargs):
-        # Remove 'user_profile' from kwargs before passing them to the super class
-        user_profile = kwargs.pop('user_profile', None)
-
-        super().__init__(*args, **kwargs)
-
-        # Set the initial values for 'class_info' and 'session_info' if user_profile is provided
-        if user_profile:
-            self.fields['class_info'].initial = user_profile.student_class
-            self.fields['session_info'].initial = user_profile.student_session
-
-            # Restrict the options for students (class and session)
-            if user_profile.employee_type == 'student':
-                # Students can only select their own class and session
-                self.fields['class_info'].queryset = ClassInfo.objects.filter(id=user_profile.student_class.id)
-                self.fields['session_info'].queryset = Session.objects.filter(id=user_profile.student_session.id)
-
-            elif user_profile.employee_type in ['teacher', 'professor']:
-                # Teachers and principals can select any class and session
-                self.fields['class_info'].queryset = ClassInfo.objects.all()
-                self.fields['session_info'].queryset = Session.objects.all()
+            
+            if user_profile.department:
+                self.fields['department_info'].initial = user_profile.department
+                self.fields['department_info'].queryset = Department.objects.filter(id=user_profile.department.id)
+            else:
+                self.fields['department_info'].queryset = Department.objects.all()
 
 
 class EnrolledStudentForm(forms.Form):
-    class_name = forms.ModelChoiceField(queryset=ClassInfo.objects.all())
+    class_name = forms.ModelChoiceField(
+        queryset=ClassInfo.objects.all(),
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        required=False,
+        initial=lambda: ClassInfo.objects.first()
+    )
     status_select = (
-          
         ('not enroll', 'Not Enroll'),
         ('enrolled', 'Enrolled'),
         ('regular', 'Regular'),
         ('irregular', 'Irregular'),
         ('passed', 'Passed'),
-        ('', 'Any Status'),
+        ('any status', 'Any Status'),
     )
-    status = forms.ChoiceField(choices=status_select, required=False)
+    status = forms.ChoiceField(
+        choices=status_select,
+        required=False,
+        widget=forms.Select(attrs={'class': 'form-control'}),
+        initial='not enroll'  # Default selection
+    )
+
 
 
 
