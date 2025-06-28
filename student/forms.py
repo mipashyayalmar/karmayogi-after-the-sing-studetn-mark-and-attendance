@@ -221,12 +221,18 @@ class StudentSearchForm(forms.Form):
     )
     registration_no = forms.IntegerField(
         required=False,
-        widget=forms.NumberInput(attrs={'placeholder': 'Registration No', 'aria-controls': 'DataTables_Table_0'})
+        widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Registration No', 'aria-controls': 'DataTables_Table_0'})
     )
     name = forms.CharField(
         required=False,
         widget=forms.TextInput(attrs={'placeholder': 'Search by Name', 'class': 'form-control'})
     )
+
+    roll_no = forms.IntegerField(
+    required=False,
+    widget=forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Roll No', 'aria-controls': 'DataTables_Table_0'})
+)
+
 
     def __init__(self, *args, **kwargs):
         user_profile = kwargs.pop('user_profile', None)

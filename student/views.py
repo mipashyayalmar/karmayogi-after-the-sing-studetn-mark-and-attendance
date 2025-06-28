@@ -164,11 +164,12 @@ def student_list(request, teacher_id=None):
     department_info = request.GET.get('department_info', None)  # New filter
     roll_no = request.GET.get('roll_no', None)
     name = request.GET.get('name', None)  # New filter for name
+    registration_no = request.GET.get('registration_no', None)
 
     # Build query for filtering students
     queries = Q(is_delete=False)  # Assuming `is_delete` exists in the AcademicInfo model
     if user_profile.employee_type == 'student':
-        queries &= Q(personal_info__userprofile=user_profile)
+        queries &= Q(userprofile=user_profile)
         if not session_info and user_profile.student_session:
             session_info = user_profile.student_session.id
         if not session_info:
@@ -190,20 +191,24 @@ def student_list(request, teacher_id=None):
 
     # Filter by department_info if provided
     if department_info:
-        queries &= Q(department_info__id=department_info)  # Assuming `department_info` is a ForeignKey
+        queries &= Q(department_info__id=department_info)
 
     # Filter by roll number if provided
     if roll_no:
-        queries &= Q(enrolledstudent__roll=roll_no)  # Use the reverse relation to filter by roll
+        queries &= Q(userprofile__id=roll_no)  # Adjusted to use 'id' since 'student_roll' is not a valid field
 
     # Filter by name if provided
     if name:
-        queries &= Q(personal_info__name__icontains=name)  # Assuming `name` exists in the PersonalInfo model
+        queries &= Q(userprofile__name__icontains=name)  # Replace with appropriate field
 
-    # Fetch students and order by session and roll number
+    # Filter by registration number if provided
+    if registration_no:
+        queries &= Q(registration_no=registration_no)  # Direct lookup on AcademicInfo
+
+    # Fetch students and order by department, session, and roll number
     students = AcademicInfo.objects.filter(queries).select_related(
-        'session_info', 'personal_info', 'class_info', 'department_info'
-    ).prefetch_related('enrolledstudent').order_by('session_info__name', 'enrolledstudent__roll')
+        'session_info', 'userprofile', 'class_info', 'department_info'
+    ).order_by('department_info__name', 'session_info__name', 'userprofile__id')
 
     # Restrict session and class options for students
     if user_profile.employee_type == 'student':

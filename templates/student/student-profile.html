@@ -33,12 +33,14 @@
                     {% if student.traveling_mode == 'college bus' %}
                     <tr><th>College Bus Stop</th><td>{{ student.college_bus_stop|default:"Not Defined"|title }}</td></tr>
                     {% else %}
-                    <tr><th>Private Traveling From</th><td>{{ student.college_bus_stop|default:"Not Defined"|title }}</td></tr>
+                    <tr><th>Bus Traveling From</th><td>{{ student.college_bus_stop|default:"Not Defined"|title }}</td> </tr>
                     {% endif %}
                   </tbody>
                 </table>
               </div>
             </div>
+            
+          
           </div>
         </div>
 
@@ -61,11 +63,11 @@
                     <tr><th>Birth Certificate No</th><td>{{ student.personal_info.birth_certificate_no }}</td></tr>
                     <tr><th>Religion</th><td>{{ student.personal_info.religion }}</td></tr>
                     <tr><th>Nationality</th><td>{{ student.personal_info.nationality }}</td></tr>
-                    <tr><th>Mother Tongue</th><td>{{ student.personal_info.mother_tongue.name|default:"Marathi" }}</td></tr>
+                    <tr><th>Mother Tongue</th><td>{{ student.personal_info.mother_tongue|default:"Marathi" }}</td></tr>
                     <tr><th>Candidature Type</th><td>{{ student.personal_info.candidature_type.name|default:"Maharashtra Type-A" }}</td></tr>
-                    <tr><th>Category</th><td>{{ student.personal_info.category.name|default:"Not Available" }}</td></tr>
-                    <tr><th>PH Type</th><td>{{ student.personal_info.ph_type.name|default:"None" }}</td></tr>
-                    <tr><th>Linguistic Minority</th><td>{{ student.personal_info.linguistic_minority.name|default:"Not Available" }}</td></tr>
+                    <tr><th>Category</th><td>{{ student.personal_info.category }}</td></tr>
+                    <tr><th>PH Type</th><td>{{ student.personal_info.ph_type|default:"None" }}</td></tr>
+                    <tr><th>Linguistic Minority</th><td>{{ student.personal_info.linguistic_minority|default:"Not Available" }}</td></tr>
                   </tbody>
                 </table>
               </div>

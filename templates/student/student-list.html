@@ -47,7 +47,82 @@
                                         <div class="col-sm-12 col-md-6">
                                             <div id="DataTables_Table_0_filter" class="dataTables_filter">
                                                 <form action="" method="GET">
-                                                    {{ form.as_p }}
+                                                    <div class="row">
+                                                        <!-- Session Info -->
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div id="session_info_filter" class="dataTables_filter">
+                                                                <form action="" method="GET">
+                                                                    <div class="form-group">
+                                                                        {{ form.session_info.label_tag }}
+                                                                        {{ form.session_info }}
+                                                                    </div>
+                                                            </div>
+                                                        </div>
+                                                    
+                                                        <!-- Class Info -->
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div id="class_info_filter" class="dataTables_filter">
+                                                                <div class="form-group">
+                                                                    {{ form.class_info.label_tag }}
+                                                                    {{ form.class_info }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="row">
+                                                        <!-- Department Info -->
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div id="department_info_filter" class="dataTables_filter">
+                                                                <div class="form-group">
+                                                                    {{ form.department_info.label_tag }}
+                                                                    {{ form.department_info }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    
+                                                        <!-- Registration Number -->
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div id="registration_no_filter" class="dataTables_filter" >
+                                                                <div class="form-group">
+                                                                    {{ form.registration_no.label_tag }}
+                                                                    {{ form.registration_no }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="row">
+                                                        <!-- Name -->
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div id="name_filter" class="dataTables_filter">
+                                                                <div class="form-group">
+                                                                    {{ form.name.label_tag }}
+                                                                    {{ form.name }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    
+                                                        <!-- Roll Number -->
+                                                        <div class="col-sm-12 col-md-6">
+                                                            <div id="roll_no_filter" class="dataTables_filter">
+                                                                <div class="form-group">
+                                                                    {{ form.roll_no.label_tag }}
+                                                                    {{ form.roll_no }}
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    
+                                                    <div class="row">
+                                                        <!-- Submit Button -->
+                                                        {% comment %} <div class="col-12">
+                                                            <div class="form-group text-center">
+                                                                <input type="submit" value="Search" class="btn btn-primary">
+                                                            </div>
+                                                        </div> {% endcomment %}
+                                                    </div>
+                                                    
                                                     <input type="submit" value="Search" class="btn btn-primary">
                                                 </form>
                                             </div>
@@ -98,15 +173,17 @@
                                             <td>{{ forloop.counter }}</td>
                                             <td class="highlight">{{ student.personal_info.name }}</td>
                                             <td class="highlight" 
-    style="background-color: {% if student.enrolledstudent.roll %}#d4edda{% else %}#f8d7da{% endif %};">
-    <span style="color: {% if student.enrolledstudent.roll %}green{% else %}red{% endif %};">
-        {{ student.enrolledstudent.roll|default:"Not Defined" }}
-    </span>
-</td>
+                                            style="background-color: {% if student.enrolledstudent.roll %}#d4edda{% else %}#f8d7da{% endif %};">
+                                            <span style="color: {% if student.enrolledstudent.roll %}green{% else %}red{% endif %};">
+                                                {{ student.enrolledstudent.roll|default:"Not Defined" }}
+                                            </span>
+                                        </td>
 
                                             <td class="highlight">{{ student.session_info }}</td>
                                            
-                                            <td class="highlight">{{ student.registration_no }}</td>
+                                            <td class="registration-number" data-value="{{ student.registration_no }}">
+                                                {{ student.registration_no }}
+                                            </td>
                                             <td class="highlight">{{ student.class_info }}</td>
                                             <td class="highlight">{{ student.department_info|default:"not defined "|upper }}</td>
                                             <td>{{ student.status }}</td>
@@ -192,6 +269,9 @@
         </div>
     </div>
 </div>
+
+
+
 
 
 <script>
